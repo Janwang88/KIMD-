@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料执行情况查询</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--background);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* 头部设计 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-content h1::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .header-content p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-left: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 统一按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-main);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background);
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--danger);
+            border-color: #fecaca;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        }
+
+        /* 搜索区域卡片 */
+        .search-section {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input-group {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            font-size: 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background);
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        /* 列表区域 */
+        .list-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .list-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .list-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-blue {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .list-content {
+            overflow-x: auto;
+        }
+
+        /* 现代化表格 */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .modern-table th {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modern-table th.sortable {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modern-table th.sortable:hover {
+            color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .modern-table td {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+
+        .modern-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modern-table tr {
+            transition: background-color 0.2s;
+        }
+
+        .modern-table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .modern-table tr.selected td {
+            background-color: #eff6ff;
+        }
+
+        .modern-table tr.selected td:first-child {
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
+
+        /* 单元格内容样式 */
+        .cell-main {
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .cell-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cell-date {
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* 操作按钮组 */
+        .action-group {
+            display: flex;
+            gap: 8px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .modern-table tr:hover .action-group {
+            opacity: 1;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eff6ff;
+        }
+
+        /* 底部固定栏 */
+        .bottom-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            background: var(--text-main);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            z-index: 50;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 400px;
+            justify-content: space-between;
+        }
+
+        .bottom-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .selection-info {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .bottom-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 快捷入口 */
+        .quick-links {
+            margin-top: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .link-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .link-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .link-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 状态与提示 */
+        .empty-state {
+            padding: 80px 0;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .update-time {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* 复选框美化 */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="page-header">
+            <div class="header-content">
+                <h1>物料执行情况查询</h1>
+                <p>从生产排程选择工单，快速查询物料执行明细</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'"
+                    style="margin-right: 8px;">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    返回统计表盘
+                </button>
+                <button class="btn btn-primary" onclick="startAutoSync()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    自动同步
+                </button>
+                <div style="position: relative; display: inline-block;">
+                    <button class="btn btn-secondary" onclick="triggerImport()">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        导入Excel
+                    </button>
+                    <input type="file" id="import-excel" accept=".xlsx,.xls" style="display:none"
+                        onchange="handleFileSelect(event)">
+                </div>
+                <button class="btn btn-secondary" onclick="forceRefresh()" title="清除缓存并重新加载"
+                    style="width: 40px; padding: 0;">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 搜索 -->
+        <div class="search-section">
+            <div class="search-wrapper">
+                <div class="search-input-group">
+                    <svg class="search-icon" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="输入工单号、项目名称或日期进行搜索..."
+                        onkeydown="if(event.key === 'Enter') handleQuery()">
+                </div>
+                <button class="btn btn-primary" style="padding: 14px 32px;" onclick="handleQuery()">查询</button>
+            </div>
+        </div>
+
+        <!-- 列表 -->
+        <div class="list-section">
+            <div class="list-header">
+                <div class="list-title">
+                    工单列表
+                    <span class="badge badge-blue" id="totalCount">共 0 个</span>
+                    <span class="badge badge-blue" id="filteredCount" style="display:none">筛选出 0 个</span>
+                    <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;" id="displayCount">显示 0
+                        条</span>
+                </div>
+                <span class="update-time" id="updateTime"></span>
+            </div>
+
+            <div class="list-content" id="listContent">
+                <!-- 列表内容由 JS 生成 -->
+            </div>
+        </div>
+
+        <!-- 快捷入口 -->
+        <div class="quick-links">
+            <a href="https://chajian.kimd.cn:9999/#/wms/produceManage/ppbomEntry?parameterStr=" target="_blank"
+                class="link-card">
+                <div class="link-title">生产投料单明细</div>
+                <div class="link-desc">查看详细的生产物料投放记录</div>
+            </a>
+            <a href="https://chajian.kimd.cn:9999/#/sc/work/productionScheduling?parameterStr=" target="_blank"
+                class="link-card">
+                <div class="link-title">生产排程</div>
+                <div class="link-desc">管理和查看生产计划与进度</div>
+            </a>
+            <a href="https://chajian.kimd.cn:9999/#/wms/produceManage/icmo?parameterStr=" target="_blank"
+                class="link-card">
+                <div class="link-title">生产任务单</div>
+                <div class="link-desc">生产任务的详细信息</div>
+            </a>
+            <a href="https://chajian.kimd.cn:9999/#/pmc/xm/sluggishMaterials?parameterStr=" target="_blank"
+                class="link-card">
+                <div class="link-title">呆滞料信息</div>
+                <div class="link-desc">库存积压与呆滞物料分析</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 底部浮动操作栏 -->
+    <div class="bottom-bar" id="bottomBar">
+        <div class="selection-info">
+            <span>已选择</span>
+            <span class="selection-count" id="selectedCount">0</span>
+            <span>个工单</span>
+        </div>
+        <div class="bottom-actions">
+            <button class="btn btn-secondary" style="border:none; background: rgba(255,255,255,0.1); color:white;"
+                onclick="clearSelection()">取消</button>
+            <button class="btn btn-success" onclick="batchQuery()">批量查询</button>
+            <button class="btn btn-primary" onclick="batchDownload()">批量下载</button>
+        </div>
+    </div>
+
+
+    <script>
+        const STORAGE_KEY = 'work_order_data';
+        const BASE_URL = 'https://chajian.kimd.cn:9999';
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // 初始工单数据（从生产排程页面提取，按接单日期倒序）
+        const initialData = [
+            { "workOrderNo": "", "taskNo": "R.F-005742601M105064", "projectName": "U66改TA003 ALT 治具改机包", "orderDate": "2026-01-27" },
+            { "workOrderNo": "MO001692", "taskNo": "N.E-005662601M070055", "projectName": "F11 扇叶清洁设备-MP 2#3#", "orderDate": "2026-01-26" },
+            { "workOrderNo": "MO001693", "taskNo": "N.E-005662601M070056", "projectName": "F11 扇叶清洁设备-MP 4#5#", "orderDate": "2026-01-26" },
+            { "workOrderNo": "MO001691", "taskNo": "N.E-005662601M070057", "projectName": "F11 扇叶清洁设备-NPI", "orderDate": "2026-01-26" },
+            { "workOrderNo": "", "taskNo": "N.E-005732601M070052", "projectName": "F11 Face Down功能测试半自动机", "orderDate": "2026-01-26" },
+            { "workOrderNo": "MO001637", "taskNo": "N.F-004692601M112042", "projectName": "Athena ALT 测试治具", "orderDate": "2026-01-20" },
+            { "workOrderNo": "MO001638", "taskNo": "N.F-004532601M112043", "projectName": "Apollo ALT 测试治具", "orderDate": "2026-01-20" },
+            { "workOrderNo": "MO001641", "taskNo": "N.F-001882601M144033", "projectName": "Roc FOP 测试治具", "orderDate": "2026-01-16" },
+            { "workOrderNo": "MO001639", "taskNo": "N.F-001892601M144036", "projectName": "Roc CGS测试治具", "orderDate": "2026-01-16" },
+            { "workOrderNo": "MO001640", "taskNo": "N.F-001892601M144034", "projectName": "Roc CGS测试治具", "orderDate": "2026-01-16" },
+            { "workOrderNo": "MO001621", "taskNo": "N.P-0003W2601M140031", "projectName": "探针针模寿命验证机", "orderDate": "2026-01-15" },
+            { "workOrderNo": "MO001600", "taskNo": "N.F-005122601M112029", "projectName": "TA003 ALT 测试治具", "orderDate": "2026-01-14" },
+            { "workOrderNo": "MO001583", "taskNo": "R.F-001862601M045018", "projectName": "Roc DT 测试治具", "orderDate": "2026-01-12" },
+            { "workOrderNo": "", "taskNo": "R.F-000272601M008007", "projectName": "2026研发专用", "orderDate": "2026-01-04" },
+            { "workOrderNo": "", "taskNo": "R.F-001802601M008008", "projectName": "2026工厂制程改善", "orderDate": "2026-01-04" },
+            { "workOrderNo": "MO001572", "taskNo": "N.E-005662601M070001", "projectName": "F11 扇叶清洁设备", "orderDate": "2026-01-04" },
+            { "workOrderNo": "", "taskNo": "N.P-0003V2512M008062", "projectName": "KIMD模组标准化", "orderDate": "2025-12-25" },
+            { "workOrderNo": "MO001532", "taskNo": "N.E-004982512M112029", "projectName": "Athena 功能测试设备", "orderDate": "2025-12-11" },
+            { "workOrderNo": "MO001575", "taskNo": "N.E-004942512M112030", "projectName": "Apollo 六面视觉检测设备", "orderDate": "2025-12-11" },
+            { "workOrderNo": "MO001571", "taskNo": "N.P-0003U2512M008006", "projectName": "SmartMachine AI智能系统", "orderDate": "2025-12-02" },
+            { "workOrderNo": "MO001471", "taskNo": "N.P-0003T2511M008066", "projectName": "T11 摩擦测试治具(验证)", "orderDate": "2025-11-28" },
+            { "workOrderNo": "MO001422", "taskNo": "N.E-005552511M070025", "projectName": "F11 线圈电阻测试自动机", "orderDate": "2025-11-11" },
+            { "workOrderNo": "MO001396", "taskNo": "R.E-004812510M070065", "projectName": "Apollo气密测试设备-台湾", "orderDate": "2025-10-28" },
+            { "workOrderNo": "MO001349", "taskNo": "R.F-005592510M070072", "projectName": "X3490 气密治具(12x)", "orderDate": "2025-10-28" },
+            { "workOrderNo": "MO001421", "taskNo": "N.E-005552510M070067", "projectName": "F11 线圈电阻测试自动机", "orderDate": "2025-10-28" },
+            { "workOrderNo": "MO001030", "taskNo": "N.E-004552508M070011", "projectName": "F75 OQC 功能测试机", "orderDate": "2025-08-07" },
+            { "workOrderNo": "MO001031", "taskNo": "N.E-004572508M070012", "projectName": "F22 OQC 功能测试机", "orderDate": "2025-08-07" },
+            { "workOrderNo": "MO000546", "taskNo": "N.F-005022505M008020", "projectName": "Apollo 功能测试治具", "orderDate": "2025-05-14" },
+            { "workOrderNo": "MO000627", "taskNo": "N.F-005032505M112021", "projectName": "Athena 功能测试治具", "orderDate": "2025-05-14" },
+            { "workOrderNo": "MO000558", "taskNo": "N.F-005042505M119018", "projectName": "T66 FCT功能测试治具", "orderDate": "2025-05-14" },
+            { "workOrderNo": "MO000463", "taskNo": "R.F-004262504M070076", "projectName": "F11 电池供电测试治具", "orderDate": "2025-04-30" },
+            { "workOrderNo": "MO000376", "taskNo": "N.P-0003N2504M112053", "projectName": "Apollo密封圈厂内验证平台", "orderDate": "2025-04-18" },
+            { "workOrderNo": "MO000781", "taskNo": "R.E-003502503M070055", "projectName": "F1 REL功能测试机", "orderDate": "2025-03-31" },
+            { "workOrderNo": "MO000930", "taskNo": "R.E-003492503M070043", "projectName": "F1 OQC功能测试机", "orderDate": "2025-03-27" },
+            { "workOrderNo": "", "taskNo": "R.F-001802502M008034", "projectName": "工厂制程改善", "orderDate": "2025-02-19" },
+            { "workOrderNo": "WORK006480", "taskNo": "R.F-000272501M070036", "projectName": "厂内实验专案", "orderDate": "2025-01-13" }
+        ];
+
+        let workOrders = [];
+        let filteredOrders = [];
+        let selectedOrders = new Set();
+
+        let refreshInterval = null;
+        let currentSort = { field: 'orderDate', direction: 'desc' }; // 默认按日期倒序
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            loadData();
+            renderList();
+
+            // 搜索框事件
+            document.getElementById('searchInput').addEventListener('input', function () {
+                filterOrders(this.value);
+            });
+
+            // 页面显示时自动检查并同步数据
+            autoSyncDataOnLoad();
+        });
+
+        // 页面加载时自动同步数据
+        async function autoSyncDataOnLoad() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                let shouldAutoSync = false;
+                let hoursDiff = 0;
+
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        const updateTime = new Date(parsed.updateTime);
+                        const now = new Date();
+                        const timeDiff = now - updateTime;
+                        hoursDiff = timeDiff / (1000 * 60 * 60);
+
+                        // 如果数据超过1小时未更新，自动同步
+                        shouldAutoSync = hoursDiff > 1;
+                    } catch (e) {
+                        // 数据解析失败，需要重新同步
+                        shouldAutoSync = true;
+                    }
+                } else {
+                    // 没有缓存数据，需要同步
+                    shouldAutoSync = true;
+                }
+
+                if (shouldAutoSync) {
+                    console.log(`检测到数据需要更新 (${hoursDiff.toFixed(1)}小时前更新)，显示同步提示...`);
+
+                    // 显示同步提示
+                    showSyncPrompt(hoursDiff);
+                } else {
+                    console.log('数据较新，无需自动同步');
+                    // 数据较新，显示正常状态
+                    const updateTimeElement = document.getElementById('updateTime');
+                    if (updateTimeElement) {
+                        updateTimeElement.textContent += ` (数据较新)`;
+                        updateTimeElement.style.color = '#52c41a';
+                    }
+                }
+
+            } catch (error) {
+                console.error('自动同步检查失败:', error);
+            }
+        }
+
+        // 显示同步提示
+        function showSyncPrompt(hoursDiff) {
+            // 检查是否已经显示过提示
+            if (document.getElementById('syncPrompt')) return;
+
+            // 创建提示元素
+            const promptDiv = document.createElement('div');
+            promptDiv.id = 'syncPrompt';
+            promptDiv.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #fffbe6;
+                    border: 1px solid #ffe58f;
+                    border-radius: 8px;
+                    padding: 16px 20px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 10000;
+                    max-width: 500px;
+                    width: 90%;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #ad8b00;">🔄 数据需要更新</strong>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999;">×</button>
+                    </div>
+                    <p style="color: #ad8b00; margin: 8px 0; font-size: 14px;">
+                        检测到数据已 ${hoursDiff.toFixed(1)} 小时未更新，建议同步最新数据
+                    </p>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button onclick="showSyncInstructions()" 
+                                style="flex: 1; padding: 8px 12px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                            如何同步数据
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="flex: 1; padding: 8px 12px; background: #f0f0f0; color: #666; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                            稍后同步
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(promptDiv);
+        }
+
+        // 显示同步说明
+        function showSyncInstructions() {
+            const instructions = `
+📋 数据同步说明：
+
+方法一：使用控制台代码（推荐）
+1. 打开KIMD系统的生产排程页面
+2. 按F12键打开浏览器开发者工具
+3. 点击"Console"（控制台）标签页
+4. 复制并粘贴以下代码到控制台：
+
+(() => {
+  const rows = document.querySelectorAll('tbody tr');
+  const data = [];
+  const seen = new Set();
+  
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length > 5) {
+      let workOrderNo = '';
+      let taskNo = '';
+      let projectName = '';
+      let orderDate = '';
+      
+      for (let i = 0; i < cells.length; i++) {
+        const txt = cells[i].textContent?.trim() || '';
+        if (/^(WORK|MO)\\d+$/.test(txt)) workOrderNo = txt;
+        else if (/^[RN]\\.[FEP]-\\d+/.test(txt)) taskNo = txt;
+        else if (/^\\d{4}-\\d{2}-\\d{2}/.test(txt) && !orderDate) orderDate = txt;
+        else if (txt.length > 3 && /[\\u4e00-\\u9fa5]/.test(txt) && 
+                !/^\\d{2}\\.\\d{3}/.test(txt) && !/\\d{4}-\\d{2}-\\d{2}/.test(txt) && 
+                txt.length < 50) {
+          if (txt.includes('测试') || txt.includes('设备') || 
+              txt.includes('治具') || txt.includes('验证')) projectName = txt;
+          else if (!projectName) projectName = txt;
+        }
+      }
+      
+      if (taskNo && !seen.has(taskNo)) {
+        seen.add(taskNo);
+        data.push({
+          workOrderNo: workOrderNo,
+          taskNo: taskNo,
+          projectName: projectName,
+          orderDate: orderDate
+        });
+      }
+    }
+  });
+  
+  data.sort((a, b) => (b.orderDate || '').localeCompare(a.orderDate || ''));
+  
+  localStorage.setItem('work_order_data', JSON.stringify({
+    data: data,
+    updateTime: new Date().toISOString()
+  }));
+  
+  console.log('同步完成，共获取到', data.length, '个工单数据');
+  alert('✅ 同步成功！共获取到' + data.length + '个工单数据，请返回物料查询工具页面查看。');
+})();
+
+5. 按回车键执行代码
+6. 同步完成后刷新本页面查看最新数据
+
+方法二：打开生产排程页面
+点击下方按钮直接打开生产排程页面：
+            `;
+
+            alert(instructions);
+
+            // 打开生产排程页面
+            window.open(`${BASE_URL}/#/sc/work/productionScheduling?parameterStr=`, '_blank');
+        }
+
+        // 开始自动刷新检查
+        function startAutoRefresh() {
+            if (refreshInterval) return;
+
+            refreshInterval = setInterval(() => {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        const updateTime = new Date(parsed.updateTime);
+                        const now = new Date();
+                        const hoursDiff = (now - updateTime) / (1000 * 60 * 60);
+
+                        // 如果数据超过4小时未更新，在页面可见时提示
+                        if (hoursDiff > 4 && !document.hidden) {
+                            console.log('检测到数据需要更新');
+                            // 可以选择自动提示用户或静默处理
+                        }
+                    } catch (e) {
+                        console.log('数据检查出错:', e);
+                    }
+                }
+            }, 30 * 60 * 1000); // 30分钟检查一次
+        }
+
+        // 停止自动刷新检查
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        // 检查数据新鲜度
+        function checkDataFreshness() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    const updateTime = new Date(parsed.updateTime);
+                    const now = new Date();
+                    const timeDiff = now - updateTime;
+                    const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+                    // 更新显示的时间信息
+                    updateUpdateTimeDisplay(parsed.updateTime);
+
+                    // 如果数据超过2小时未更新，提示用户
+                    if (hoursDiff > 2) {
+                        setTimeout(() => {
+                            if (confirm(`检测到数据已超过${Math.floor(hoursDiff)}小时未更新，建议同步最新数据。\n\n是否立即同步？`)) {
+                                refreshData();
+                            }
+                        }, 1000);
+                    }
+                } catch (e) {
+                    // 数据解析失败，建议重新同步
+                    setTimeout(() => {
+                        if (confirm('检测到数据异常，建议重新同步数据。\n\n是否立即同步？')) {
+                            refreshData();
+                        }
+                    }, 1000);
+                }
+            }
+        }
+
+        // 更新时间显示
+        function updateUpdateTimeDisplay(updateTime, source, sourceFile) {
+            const timeElement = document.getElementById('updateTime');
+            if (timeElement && updateTime) {
+                const time = new Date(updateTime);
+                const now = new Date();
+                const diffMs = now - time;
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                let timeText = `最后更新: ${time.toLocaleString('zh-CN')}`;
+
+                // 添加来源标识
+                let sourceText = '';
+                if (source === 'server') {
+                    sourceText = ' <span style="background:#52c41a;color:white;padding:2px 6px;border-radius:4px;font-size:11px;">来自本地服务器</span>';
+                    if (sourceFile) {
+                        sourceText += ` <span style="color:#666;font-size:11px;margin-left:5px;">📁 ${sourceFile}</span>`;
+                    }
+                } else if (source === 'local') {
+                    sourceText = ' <span style="background:#faad14;color:white;padding:2px 6px;border-radius:4px;font-size:11px;">来自浏览器缓存</span>';
+                }
+
+                if (diffHours < 1 && diffMinutes > 0) {
+                    timeText += ` (${diffMinutes}分钟前)`;
+                } else if (diffHours >= 1 && diffHours < 24) {
+                    timeText += ` (${diffHours}小时前)`;
+                } else if (diffHours >= 24) {
+                    const diffDays = Math.floor(diffHours / 24);
+                    timeText += ` (${diffDays}天前)`;
+                }
+
+                timeElement.innerHTML = timeText + sourceText;
+
+                // 根据数据新鲜度改变显示颜色
+                if (diffHours > 24) {
+                    timeElement.style.color = '#ff4d4f'; // 红色 - 很旧
+                } else if (diffHours > 6) {
+                    timeElement.style.color = '#faad14'; // 橙色 - 较旧
+                } else {
+                    timeElement.style.color = '#52c41a'; // 绿色 - 较新
+                }
+            } else if (timeElement) {
+                timeElement.textContent = '暂无更新记录';
+            }
+        }
+
+        // 加载数据
+        async function loadData() {
+            // 优先尝试从本地服务器获取数据
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/work-orders`);
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.length > 0) {
+                    console.log('从本地服务器加载数据成功');
+                    workOrders = result.data;
+                    workOrders = result.data;
+                    // 更新时间显示，并标记来源
+                    updateUpdateTimeDisplay(result.updateTime, 'server', result.sourceFile);
+
+                    // 特殊处理：保存一份副本到localStorage作为备用
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                        data: workOrders,
+                        updateTime: result.updateTime
+                    }));
+                } else {
+                    throw new Error('服务器无数据');
+                }
+            } catch (err) {
+                console.log('无法连接服务器或无数据，降级使用本地缓存:', err);
+
+                // 降级逻辑：读取 localStorage
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        workOrders = parsed.data || initialData;
+                        updateUpdateTimeDisplay(parsed.updateTime, 'local');
+                    } catch (e) {
+                        workOrders = initialData;
+                        updateUpdateTimeDisplay(null);
+                    }
+                } else {
+                    workOrders = initialData;
+                    saveData(); // 保存初始数据
+                    updateUpdateTimeDisplay(new Date().toISOString(), 'init');
+                }
+            }
+
+            filteredOrders = [...workOrders];
+            updateStats();
+            sortFilteredOrders(); // Apply default sort
+            renderList(); // 重新渲染列表
+        }
+
+        // 保存数据 (仅用于本地变更，实际上主要是只读)
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                data: workOrders,
+                updateTime: new Date().toISOString()
+            }));
+        }
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('totalCount').textContent = `共 ${workOrders.length} 个工单`;
+            document.getElementById('displayCount').textContent = `显示 ${filteredOrders.length} 条`;
+
+            const filteredCountEl = document.getElementById('filteredCount');
+            if (filteredOrders.length !== workOrders.length) {
+                filteredCountEl.textContent = `筛选出 ${filteredOrders.length} 个`;
+                filteredCountEl.style.display = 'inline';
+            } else {
+                filteredCountEl.style.display = 'none';
+            }
+        }
+
+        // 筛选工单
+        function filterOrders(keyword) {
+            keyword = keyword.toLowerCase().trim();
+            if (!keyword) {
+                filteredOrders = [...workOrders];
+            } else {
+                filteredOrders = workOrders.filter(order =>
+                    (order.workOrderNo && order.workOrderNo.toLowerCase().includes(keyword)) ||
+                    order.projectName.toLowerCase().includes(keyword) ||
+                    (order.taskNo && order.taskNo.toLowerCase().includes(keyword)) ||
+                    (order.orderDate && order.orderDate.includes(keyword))
+                );
+            }
+            // 筛选后重新排序
+            sortFilteredOrders();
+            renderList();
+            updateStats();
+        }
+
+        // 排序逻辑
+        function sortOrders(field) {
+            if (currentSort.field === field) {
+                // 切换方向
+                currentSort.direction = currentSort.direction === 'desc' ? 'asc' : 'desc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'desc'; // 新字段默认倒序
+            }
+            sortFilteredOrders();
+            renderList();
+        }
+
+        function sortFilteredOrders() {
+            const { field, direction } = currentSort;
+            filteredOrders.sort((a, b) => {
+                const valA = (a[field] || '').toString();
+                const valB = (b[field] || '').toString();
+
+                if (direction === 'asc') {
+                    return valA.localeCompare(valB, 'zh-CN');
+                } else {
+                    return valB.localeCompare(valA, 'zh-CN');
+                }
+            });
+        }
+
+        // 渲染列表
+        function renderList() {
+            const container = document.getElementById('listContent');
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="margin-bottom:16px; color:var(--text-muted); opacity:0.5;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <p>没有找到匹配的工单</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const isAllSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedOrders.has(o.taskNo));
+
+            container.innerHTML = `
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th width="60" style="text-align:center">
+                                <input type="checkbox" onclick="toggleSelectAll(this)" ${isAllSelected ? 'checked' : ''}>
+                            </th>
+                            <th class="sortable" onclick="sortOrders('workOrderNo')">
+                                工单信息 ${currentSort.field === 'workOrderNo' ? (currentSort.direction === 'desc' ? '↓' : '↑') : ''}
+                            </th>
+                            <th class="sortable" onclick="sortOrders('projectName')">
+                                项目名称 ${currentSort.field === 'projectName' ? (currentSort.direction === 'desc' ? '↓' : '↑') : ''}
+                            </th>
+                            <th class="sortable" onclick="sortOrders('orderDate')">
+                                接单时间 ${currentSort.field === 'orderDate' ? (currentSort.direction === 'desc' ? '↓' : '↑') : ''}
+                            </th>
+                            <th class="sortable" onclick="sortOrders('orderQty')">
+                                工单数量 ${currentSort.field === 'orderQty' ? (currentSort.direction === 'desc' ? '↓' : '↑') : ''}
+                            </th>
+                            <th width="160">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredOrders.map(order => `
+                            <tr class="${selectedOrders.has(order.taskNo) ? 'selected' : ''}" onclick="toggleSelect('${order.taskNo}')">
+                                <td style="text-align: center;">
+                                    <input type="checkbox" 
+                                           ${selectedOrders.has(order.taskNo) ? 'checked' : ''}
+                                           onclick="event.stopPropagation(); toggleSelect('${order.taskNo}', this.checked)">
+                                </td>
+                                <td>
+                                    <div class="cell-main">${order.workOrderNo}</div>
+                                </td>
+                                <td>
+                                    <div class="cell-main" style="color:var(--text-main); font-size:14px; font-weight:500;" title="${order.projectName}">${order.projectName}</div>
+                                </td>
+                                <td>
+                                    <div class="cell-date">${order.orderDate || '-'}</div>
+                                </td>
+                                <td>
+                                    <div class="cell-main" style="color:var(--text-main); text-align:right; font-family:inherit;">${order.orderQty || '-'}</div>
+                                </td>
+                                <td>
+                                    <div class="action-group">
+                                        <button class="btn-icon" title="投料明细" onclick="event.stopPropagation(); queryMaterial('${order.taskNo}')">
+                                            投料
+                                        </button>
+                                        <button class="btn-icon" title="到料明细" onclick="event.stopPropagation(); queryBarcodeMaterial('${order.taskNo}')">
+                                            到料
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll(checkbox) {
+            if (checkbox.checked) {
+                filteredOrders.forEach(order => selectedOrders.add(order.taskNo));
+            } else {
+                selectedOrders.clear();
+            }
+            updateBottomBar();
+            renderList();
+        }
+
+        // 切换选择
+        function toggleSelect(taskNo, checked) {
+            if (checked === undefined) {
+                checked = !selectedOrders.has(taskNo);
+            }
+
+            if (checked) {
+                selectedOrders.add(taskNo);
+            } else {
+                selectedOrders.delete(taskNo);
+            }
+
+            updateBottomBar();
+            renderList();
+        }
+
+        // 更新底部栏
+        function updateBottomBar() {
+            const bottomBar = document.getElementById('bottomBar');
+            const count = selectedOrders.size;
+
+            if (count > 0) {
+                bottomBar.classList.add('visible'); // Show
+                document.getElementById('selectedCount').textContent = count;
+            } else {
+                bottomBar.classList.remove('visible'); // Hide
+            }
+        }
+
+        // 清除选择
+        function clearSelection() {
+            selectedOrders.clear();
+            updateBottomBar();
+            renderList();
+        }
+
+        // 获取有效的工单号（优先 N. 或 R. 开头）
+        function getValidWorkOrderNo(order) {
+            if (!order) return '';
+            // 检查 workOrderNo 是否符合 N. 或 R. 开头
+            if (order.workOrderNo && /^[NR]\./.test(order.workOrderNo)) return order.workOrderNo;
+            // 检查 taskNo 是否符合
+            if (order.taskNo && /^[NR]\./.test(order.taskNo)) return order.taskNo;
+            // 如果都不符合，优先返回 workOrderNo，其次 taskNo
+            return order.workOrderNo || order.taskNo;
+        }
+
+        // 查询物料明细（单个）
+        function queryMaterial(identifier) {
+            const order = workOrders.find(o => o.taskNo === identifier || o.workOrderNo === identifier);
+            const targetNo = getValidWorkOrderNo(order) || identifier;
+
+            const url = `${BASE_URL}/#/wms/produceManage/ppbomEntry?parameterStr=`;
+            window.open(url, '_blank');
+
+            setTimeout(() => {
+                alert(`请在打开的页面中：\n\n1. 在"工单号"输入框中输入: ${targetNo}\n2. 点击"过滤"按钮查询`);
+            }, 500);
+        }
+
+        // 为了能给统计页面发消息，把窗口存下来
+        let currentStatsWindow = null;
+        let currentKimdWindow = null; // 用于存储 KIMD 导出页面句柄，实现自动关闭
+
+        // 查询条码系统物料执行情况明细 (到料明细)
+        function queryBarcodeMaterial(identifier) {
+            // 查找对应的工单以获取项目名称
+            const order = workOrders.find(o => o.workOrderNo === identifier || o.taskNo === identifier);
+            const projectName = order ? order.projectName : '';
+            const targetNo = getValidWorkOrderNo(order) || identifier;
+
+            // 焦点防抢夺策略：
+            // 1. 同步打开统计页面（会被立刻推入后台）
+            const since = Date.now();
+            const statsUrl = `http://localhost:3000/index.html?workOrder=${encodeURIComponent(targetNo)}&project=${encodeURIComponent(projectName)}&since=${since}`;
+            currentStatsWindow = window.open(statsUrl, '_blank');
+
+            // 2. 延迟 100ms 开启 KIMD 导出页面，并通过执行 focus() 强行将其拉回前台激活篡改猴
+            setTimeout(() => {
+                const kimdUrl = `${BASE_URL}/#/wms/reportManage/materialProgres?auto=true&workOrder=${encodeURIComponent(targetNo)}`;
+                currentKimdWindow = window.open(kimdUrl, `kimd_export_${targetNo}`);
+                if (currentKimdWindow) {
+                    currentKimdWindow.focus(); // 强制提权
+                }
+            }, 100);
+        }
+
+        // 接收来自 KIMD Tampermonkey 的消息（下载触发成功）和来自统计页面的消息
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'kimd-download-triggered') {
+                // 将消息转发给当前打开的 stats 窗口，让它开始监控新导出的 excel 文件
+                if (currentStatsWindow && !currentStatsWindow.closed) {
+                    currentStatsWindow.postMessage({
+                        type: 'kimd-excel-wait',
+                        payload: event.data.payload
+                    }, '*');
+                }
+            } else if (event.data && event.data.type === 'STATS_BATCH_COMPLETED') {
+                // 收到统计页面（index.html）完成渲染的消息，自动关闭此时打开的 KIMD 页面
+                if (currentKimdWindow && !currentKimdWindow.closed) {
+                    try {
+                        currentKimdWindow.close();
+                        currentKimdWindow = null;
+                        console.log('已自动关闭 KIMD 导出窗口');
+                    } catch (e) {
+                        console.error('关闭 KIMD 窗口失败', e);
+                    }
+                }
+            }
+        });
+
+        // 批量查询
+        function batchQuery() {
+            if (selectedOrders.size === 0) return;
+
+            // 获取选中的工单号
+            const orders = [];
+            selectedOrders.forEach(taskNo => {
+                const order = workOrders.find(o => o.taskNo === taskNo);
+                if (order) {
+                    orders.push(getValidWorkOrderNo(order));
+                }
+            });
+
+            const url = `${BASE_URL}/#/wms/produceManage/ppbomEntry?parameterStr=`;
+            window.open(url, '_blank');
+
+            setTimeout(() => {
+                alert(`请在打开的页面中过滤以下工单：\n\n${orders.join('\n')}\n\n提示：可以在"工单号"输入框中逐个输入查询`);
+            }, 500);
+        }
+
+        // 批量下载到料明细 (顺序执行)
+        async function batchDownload() {
+            if (selectedOrders.size === 0) return;
+
+            // 获取选中的工单
+            const orders = [];
+            selectedOrders.forEach(taskNo => {
+                const order = workOrders.find(o => o.taskNo === taskNo);
+                if (order) {
+                    orders.push(order);
+                }
+            });
+
+            if (!confirm(`即将为 ${orders.length} 个工单执行顺序下载。\n\n⚠️ 请注意：\n1. 将逐个打开新窗口，前一个完成后会自动关闭并开始下一个。\n2. 请保持本页面开启，不要关闭。\n\n是否继续？`)) {
+                return;
+            }
+
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:rgba(0,0,0,0.8);color:white;padding:15px;border-radius:8px;z-index:9999;font-size:14px;';
+            statusDiv.innerHTML = `正在初始化批量任务...`;
+            document.body.appendChild(statusDiv);
+
+            const updateStatus = (msg) => statusDiv.textContent = msg;
+
+            // 监听器
+            let resolveCurrent = null;
+            const messageHandler = (event) => {
+                if (event.data && event.data.type === 'STATS_BATCH_COMPLETED') {
+                    if (resolveCurrent) resolveCurrent(true);
+                }
+            };
+            window.addEventListener('message', messageHandler);
+
+            for (let i = 0; i < orders.length; i++) {
+                const order = orders[i];
+                const targetNo = getValidWorkOrderNo(order);
+                const progress = `[${i + 1}/${orders.length}]`;
+
+                updateStatus(`${progress} 正在处理: ${targetNo}...`);
+                console.log(`${progress} Start: ${targetNo}`);
+
+                const url = `http://localhost:3000/index.html?workOrder=${encodeURIComponent(targetNo)}&project=${encodeURIComponent(order.projectName)}&auto=true`;
+
+                // 打开窗口
+                const win = window.open(url, `batch_dl_${targetNo}`);
+
+                // 等待完成或超时 (超时设置为 150 秒，给予充足时间)
+                const success = await new Promise(resolve => {
+                    resolveCurrent = resolve;
+                    // 超时计时器
+                    setTimeout(() => {
+                        resolve(false);
+                    }, 150000);
+                });
+
+                if (success) {
+                    console.log(`${progress} Success: ${targetNo}`);
+                    updateStatus(`${progress} 完成: ${targetNo}`);
+                } else {
+                    console.warn(`${progress} Timeout: ${targetNo}`);
+                    updateStatus(`${progress} 超时 (已跳过): ${targetNo}`);
+                }
+
+                // 稍微等待一下再开下一个，给浏览器喘息时间
+                await new Promise(r => setTimeout(r, 2000));
+            }
+
+            window.removeEventListener('message', messageHandler);
+            updateStatus(`✅ 批量任务结束！共处理 ${orders.length} 个。`);
+            setTimeout(() => document.body.removeChild(statusDiv), 5000);
+            alert(`批量任务已完成！`);
+        }
+
+        // 处理查询
+        function handleQuery() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value.trim();
+
+            if (!keyword) {
+                alert('请输入工单号或项目名称');
+                return;
+            }
+
+            // 尝试在现有数据中查找（为了获取项目名称）
+            const order = workOrders.find(o =>
+                (o.workOrderNo && o.workOrderNo.toLowerCase() === keyword.toLowerCase()) ||
+                (o.taskNo && o.taskNo.toLowerCase() === keyword.toLowerCase())
+            );
+
+            // 如果找到了，使用完整的工单信息（包含项目名称）
+            // 如果没找到，直接使用输入值作为工单号去查询
+            const identifier = order ? (order.taskNo || order.workOrderNo) : keyword;
+
+            // 调用“到料明细”的逻辑
+            queryBarcodeMaterial(identifier);
+        }
+
+        // 清空搜索
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterOrders('');
+        }
+
+        // 刷新数据（智能同步）
+        function refreshData() {
+            // 首先提供使用书签的简单方式
+            const useBookmarklet = confirm(`是否使用书签工具同步数据？(推荐)
+            
+优势：
+✅ 简单可靠
+✅ 一键同步
+✅ 避免浏览器安全限制
+
+点击"确定"使用书签同步
+点击"取消"使用自动尝试`);
+
+            if (useBookmarklet) {
+                createAndUseBookmarklet();
+                return;
+            }
+
+            // 如果用户选择自动同步，则尝试iframe方式
+            performAutomaticSync();
+        }
+
+        // 创建并使用书签工具 (已废弃，改为提示使用脚本)
+        function createAndUseBookmarklet() {
+            const instructions = `
+📋 数据同步说明：
+我们已经升级了同步方式！
+
+1. 请确保您已安装 "KIMD 生产排程数据同步助手" 脚本
+   (该脚本会自动在 KIMD 页面右下角添加同步按钮)
+
+2. 操作步骤：
+   • 点击下方按钮打开生产排程页面
+   • 点击页面右下角的 "🔄 同步到本地工具" 按钮
+   • 看到成功提示后，返回本页面刷新即可
+
+不需要再复制粘贴代码了！
+            `;
+
+            alert(instructions);
+
+            // 提供快速打开生产排程页面的选项
+            if (confirm('是否现在打开生产排程页面？')) {
+                window.open(`${BASE_URL}/#/sc/work/productionScheduling?parameterStr=`, '_blank');
+            }
+        }
+
+        // 执行自动同步尝试
+        async function performAutomaticSync() {
+            // 显示加载状态
+            const refreshBtn = document.querySelector('[onclick="refreshData()"]');
+            const originalText = refreshBtn.textContent;
+            refreshBtn.textContent = '同步中...';
+            refreshBtn.disabled = true;
+
+            try {
+                // 检查浏览器是否支持所需功能
+                if (!window.fetch) {
+                    alert('浏览器不支持fetch API，请使用现代浏览器（如Chrome、Firefox、Safari等）');
+                    return;
+                }
+
+                // 提示用户需要在KIMD系统中登录
+                const userConfirmed = confirm('即将开始同步生产排程数据。\n\n请确保：\n1. 您已在KIMD系统中登录\n2. 网络连接正常\n\n点击"确定"继续同步');
+
+                if (!userConfirmed) {
+                    return;
+                }
+
+                // 直接从生产排程页面获取数据
+                const scheduleUrl = `${BASE_URL}/#/sc/work/productionScheduling?parameterStr=`;
+
+                // 创建一个隐藏的iframe来加载页面
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.style.width = '800px';
+                iframe.style.height = '600px';
+                iframe.src = scheduleUrl;
+                document.body.appendChild(iframe);
+
+                // 等待页面加载完成
+                await new Promise((resolve, reject) => {
+                    let loadAttempts = 0;
+                    const maxAttempts = 10;
+
+                    const checkLoad = () => {
+                        loadAttempts++;
+                        try {
+                            // 检查iframe是否加载完成
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            if (iframeDoc && iframeDoc.readyState === 'complete') {
+                                setTimeout(resolve, 2000); // 额外等待2秒确保数据加载
+                                return;
+                            }
+                        } catch (e) {
+                            // 跨域错误是预期的，继续等待
+                        }
+
+                        if (loadAttempts < maxAttempts) {
+                            setTimeout(checkLoad, 1000);
+                        } else {
+                            reject(new Error('页面加载超时'));
+                        }
+                    };
+
+                    // 开始检查
+                    setTimeout(checkLoad, 1000);
+                });
+
+                // 尝试从iframe中提取数据
+                let workOrders = [];
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    workOrders = extractDataFromPage(iframeDoc);
+                } catch (e) {
+                    console.log('无法直接提取数据，将提供手动同步方式:', e);
+                }
+
+                // 清理iframe
+                document.body.removeChild(iframe);
+
+                if (workOrders.length > 0) {
+                    // 保存到本地存储
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                        data: workOrders,
+                        updateTime: new Date().toISOString()
+                    }));
+
+                    // 重新加载数据
+                    loadData();
+                    renderList();
+
+                    alert(`✅ 同步成功！\n\n获取到 ${workOrders.length} 个工单数据。\n数据已更新至最新状态。`);
+                } else {
+                    // 如果无法直接提取，提示用户手动操作
+                    handleManualSync();
+                }
+
+            } catch (error) {
+                console.error('同步数据失败:', error);
+                alert(`❌ 同步失败: ${error.message}\n\n将提供手动同步方式。`);
+                handleManualSync();
+            } finally {
+                // 恢复按钮状态
+                refreshBtn.textContent = originalText;
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // 处理手动同步
+        function handleManualSync() {
+            const instructions = `
+由于浏览器安全限制，无法自动获取数据。
+
+请按以下步骤手动同步：
+
+1. 点击下方"打开生产排程"按钮
+2. 在新打开的页面中确保已登录系统
+3. 按 F12 打开开发者工具
+4. 在控制台(Console)中粘贴并执行以下代码：
+
+javascript:(function(){const rows=document.querySelectorAll('tbody tr');const data=[];const seen=new Set();rows.forEach(row=>{const cells=row.querySelectorAll('td');if(cells.length>5){let w='',p='',t='',d='';for(let i=0;i<cells.length;i++){const txt=cells[i].textContent?.trim()||'';if(/^(WORK|MO)\\d+$/.test(txt))w=txt;if(/^[RN]\\.[FEP]-\\d+/.test(txt))t=txt;if(/^\\d{4}-\\d{2}-\\d{2}$/.test(txt)&&!d)d=txt;if(txt.length>3&&/[\\u4e00-\\u9fa5]/.test(txt)&&!/^\\d{2}\\.\\d{3}/.test(txt)&&!/\\d{4}-\\d{2}-\\d{2}/.test(txt)&&txt.length<50){if(txt.includes('测试')||txt.includes('设备')||txt.includes('治具')||txt.includes('验证'))p=txt;else if(!p)p=txt;}}if(t&&!seen.has(t)){seen.add(t);data.push({workOrderNo:w,taskNo:t,projectName:p,orderDate:d});}}});data.sort((a,b)=>(b.orderDate||'').localeCompare(a.orderDate||''));const json=JSON.stringify({data:data,updateTime:new Date().toISOString()});localStorage.setItem('work_order_data',json);alert('已同步'+data.length+'个工单数据！\\n\\n请返回查询工具页面刷新查看。');})();
+
+5. 执行后会提示同步成功，刷新本页面即可
+            `;
+
+            alert(instructions);
+
+            // 打开生产排程页面
+            if (confirm('是否现在打开生产排程页面？')) {
+                window.open(`${BASE_URL}/#/sc/work/productionScheduling?parameterStr=`, '_blank');
+            }
+        }
+
+
+
+        // ==========================
+        // 自动同步逻辑 (V2.0)
+        // ==========================
+        async function startAutoSync() {
+            const btn = document.querySelector('[onclick="startAutoSync()"]');
+            const originalText = btn.textContent;
+
+            try {
+                // 1. 启动后端监听
+                const watchPromise = fetch(`${API_BASE_URL}/api/watch-schedule-export`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timeoutMs: 300000 }) // 5分钟超时
+                }).then(r => r.json());
+
+                // 2. 打开KIMD页面让脚本自动点击导出
+                // 添加 autoExport=true 参数
+                const targetUrl = `${BASE_URL}/#/sc/work/productionScheduling?autoExport=true&t=${Date.now()}`;
+                window.open(targetUrl, '_blank');
+
+                // 3. 更新UI并等待
+                btn.textContent = '⏳ 等待导出...';
+                btn.disabled = true;
+
+                const result = await watchPromise;
+
+                if (result.success) {
+                    alert(`✅ 同步成功！\n\n自动抓取并导入了 ${result.count} 条数据。\n文件: ${result.file}`);
+                    loadData();
+                } else {
+                    alert(`⚠️ 同步未完成: ${result.message}`);
+                }
+
+            } catch (e) {
+                console.error('AutoSync error:', e);
+                alert('服务器连接失败，请确保本地服务已启动');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // 从页面中提取数据
+        function extractDataFromPage(doc) {
+            const workOrders = [];
+            const seen = new Set();
+
+            // 尝试不同的选择器来获取表格数据
+            const selectors = [
+                'tbody tr',
+                '.ant-table-tbody tr',
+                'table tr',
+                '#data-table tbody tr'
+            ];
+
+            let rows = [];
+            for (const selector of selectors) {
+                rows = doc.querySelectorAll(selector);
+                if (rows.length > 0) break;
+            }
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 5) { // 确保有足够的列
+                    let workOrderNo = '';
+                    let taskNo = '';
+                    let projectName = '';
+                    let orderDate = '';
+
+                    // 遍历所有单元格提取信息
+                    cells.forEach(cell => {
+                        const txt = cell.textContent?.trim() || '';
+
+                        // 提取工单号
+                        if (/^(WORK|MO)\d+$/.test(txt)) {
+                            workOrderNo = txt;
+                        }
+                        // 提取任务号
+                        else if (/^[RN]\.[FEP]-\d+/.test(txt)) {
+                            taskNo = txt;
+                        }
+                        // 提取日期 (放宽限制)
+                        else if (/^\d{4}-\d{2}-\d{2}/.test(txt) && !orderDate) {
+                            orderDate = txt;
+                        }
+                        // 提取项目名称
+                        else if (txt.length > 3 && /[\u4e00-\u9fa5]/.test(txt) &&
+                            !/^\d{2}\.\d{3}/.test(txt) &&
+                            !/\d{4}-\d{2}-\d{2}/.test(txt) &&
+                            txt.length < 50) {
+                            if (txt.includes('测试') || txt.includes('设备') ||
+                                txt.includes('治具') || txt.includes('验证')) {
+                                projectName = txt;
+                            } else if (!projectName) {
+                                projectName = txt;
+                            }
+                        }
+                    });
+
+                    // 确保任务号唯一且有效
+                    if (taskNo && !seen.has(taskNo)) {
+                        seen.add(taskNo);
+                        workOrders.push({
+                            workOrderNo: workOrderNo,
+                            taskNo: taskNo,
+                            projectName: projectName,
+                            orderDate: orderDate
+                        });
+                    }
+                }
+            });
+
+            // 按日期倒序排列
+            workOrders.sort((a, b) => (b.orderDate || '').localeCompare(a.orderDate || ''));
+
+            return workOrders;
+        }
+
+        // 触发文件选择
+        function triggerImport() {
+            document.getElementById('import-excel').click();
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const base64 = e.target.result.split(',')[1];
+
+                const btn = document.querySelector('[onclick="triggerImport()"]');
+                const originalText = btn.textContent;
+                btn.textContent = '导入中...';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/import-work-orders`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ fileContent: base64 })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(`✅ 导入成功！\n\n共更新 ${data.count} 条工单数据。`);
+                        loadData(); // 重新加载数据
+                    } else {
+                        alert(`❌ 导入失败: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('❌ 导入出错，请检查服务器是否运行。');
+                } finally {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    event.target.value = ''; // 重置文件输入
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 强制刷新数据（清除缓存并重新加载）
+        function forceRefresh() {
+            if (confirm('此操作将清除本地缓存并重新加载初始数据。\n\n是否继续？')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+    </script>
+</body>
+
+</html>

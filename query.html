@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料执行情况查询系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* 头部导航 */
+        .header {
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* 登录面板 */
+        .login-panel {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-panel h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* 搜索面板 */
+        .search-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #e4e6ea;
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stat-card.primary .value {
+            color: #1a73e8;
+        }
+
+        .stat-card.success .value {
+            color: #52c41a;
+        }
+
+        .stat-card.warning .value {
+            color: #faad14;
+        }
+
+        .stat-card.danger .value {
+            color: #ff4d4f;
+        }
+
+        /* 数据表格 */
+        .data-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #fafafa;
+            font-weight: 500;
+            color: #555;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f5f7fa;
+        }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-tag.success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status-tag.warning {
+            background: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+
+        .status-tag.danger {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .status-tag.info {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            padding: 60px 24px;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 隐藏 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 提示信息 */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #1890ff;
+        }
+
+        .alert-error {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            color: #ff4d4f;
+        }
+
+        .alert-success {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #52c41a;
+        }
+
+        /* 历史记录 */
+        .history-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .history-title {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .history-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-tag {
+            padding: 4px 12px;
+            background: #f0f2f5;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-tag:hover {
+            background: #1a73e8;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 登录面板 -->
+    <div id="loginPanel" class="login-panel">
+        <h2>物料执行情况查询系统</h2>
+        <div id="loginError" class="alert alert-error hidden"></div>
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label>账号</label>
+            <input type="text" id="userCode" placeholder="请输入账号" value="wangjian">
+        </div>
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label>密码</label>
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="login()">登 录</button>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="mainApp" class="hidden">
+        <div class="header">
+            <h1>物料执行情况查询系统</h1>
+            <div class="user-info">
+                <a href="material_stats.html"
+                    style="color:white; text-decoration:none; margin-right: 12px; font-size: 14px;">物料统计表盘</a>
+                <a href="outsource_stats.html"
+                    style="color:white; text-decoration:none; margin-right: 16px; font-size: 14px;">外协工时对账</a>
+                <a href="users_auth.html" id="authCenterBtn"
+                    style="color:#fcd34d; font-weight:800; text-decoration:none; margin-right: 16px; font-size: 14px; display: none;">⚙️
+                    系统授权核心</a>
+                <span class="user-name" id="displayUserName">未登录</span>
+                <button class="logout-btn" onclick="logout()">退出</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <!-- 搜索面板 -->
+            <div class="search-panel">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label>工单号</label>
+                        <input type="text" id="workOrderNo" placeholder="输入工单号，如 WORK006480">
+                    </div>
+                    <div class="form-group">
+                        <label>物料代码</label>
+                        <input type="text" id="materialCode" placeholder="可选，物料代码">
+                    </div>
+                    <div class="form-group">
+                        <label>物料名称</label>
+                        <input type="text" id="materialName" placeholder="可选，物料名称">
+                    </div>
+                    <div class="form-group">
+                        <label>领料状态</label>
+                        <select id="pickingStatus">
+                            <option value="">全部</option>
+                            <option value="未领料">未领料</option>
+                            <option value="部分领料">部分领料</option>
+                            <option value="领料完成">领料完成</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="search()" id="searchBtn">查 询</button>
+                    <button class="btn btn-secondary" onclick="resetSearch()">重 置</button>
+                    <button class="btn btn-secondary" onclick="exportData()">导 出</button>
+                </div>
+
+                <div class="history-section" id="historySection">
+                    <div class="history-title">历史查询</div>
+                    <div class="history-tags" id="historyTags"></div>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card primary">
+                    <div class="label">物料总数</div>
+                    <div class="value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="label">已完成领料</div>
+                    <div class="value" id="statCompleted">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="label">部分领料</div>
+                    <div class="value" id="statPartial">0</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="label">未领料</div>
+                    <div class="value" id="statPending">0</div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-panel">
+                <div class="panel-header">
+                    <h3>物料执行明细</h3>
+                    <span id="resultCount" style="color: #888; font-size: 13px;"></span>
+                </div>
+                <div class="table-container">
+                    <div id="loadingState" class="loading hidden">
+                        <div class="spinner"></div>
+                    </div>
+                    <div id="emptyState" class="empty-state">
+                        <svg viewBox="0 0 64 64" fill="currentColor">
+                            <path
+                                d="M32 2C15.4 2 2 15.4 2 32s13.4 30 30 30 30-13.4 30-30S48.6 2 32 2zm0 54C18.8 56 8 45.2 8 32S18.8 8 32 8s24 10.8 24 24-10.8 24-24 24z" />
+                            <path
+                                d="M32 16c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2s2-.9 2-2V18c0-1.1-.9-2-2-2zm0 24c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                        </svg>
+                        <p>请输入工单号进行查询</p>
+                    </div>
+                    <table id="dataTable" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>生产任务单号</th>
+                                <th>工单号</th>
+                                <th>产品名称</th>
+                                <th>物料代码</th>
+                                <th>物料名称</th>
+                                <th>规格型号</th>
+                                <th>计划数量</th>
+                                <th>库存数量</th>
+                                <th>备料数量</th>
+                                <th>实际领料</th>
+                                <th>来料状态</th>
+                                <th>领料状态</th>
+                                <th>单位</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'material_query_history';
+        let currentData = [];
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', function () {
+            // 检查是否已登录
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                showMainApp(JSON.parse(savedUser));
+            }
+
+            // 绑定回车键
+            document.getElementById('workOrderNo').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') search();
+            });
+
+            document.getElementById('password').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') login();
+            });
+
+            loadHistory();
+        });
+
+        // 登录
+        async function login() {
+            const userCode = document.getElementById('userCode').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!userCode || !password) {
+                showLoginError('请输入账号和密码');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userCode, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const user = { userName: result.data.userName, userCode, role: result.data.role, department: result.data.department };
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    showMainApp(user);
+                } else {
+                    showLoginError(result.message || '登录失败');
+                }
+            } catch (error) {
+                showLoginError('网络错误，请检查服务是否启动');
+            }
+        }
+
+        function showLoginError(msg) {
+            const el = document.getElementById('loginError');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function showMainApp(user) {
+            document.getElementById('loginPanel').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('displayUserName').textContent = user.userName || user.userCode;
+
+            // 如果是刚才创建的超级管理员或者是授权中心指定的 admin 角色，放行系统设置面板
+            if (user.userCode === 'wangjian' || user.role === 'admin') {
+                document.getElementById('authCenterBtn').style.display = 'inline-block';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        // 搜索
+        async function search() {
+            const workOrderNo = document.getElementById('workOrderNo').value.trim();
+
+            if (!workOrderNo) {
+                alert('请输入工单号');
+                return;
+            }
+
+            // 保存历史
+            saveHistory(workOrderNo);
+
+            // 显示加载状态
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('dataTable').classList.add('hidden');
+            document.getElementById('searchBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/ppbom-entry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        workOrderNo,
+                        pageSize: 500
+                    })
+                });
+
+                const result = await response.json();
+
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('searchBtn').disabled = false;
+
+                if (result.success) {
+                    currentData = result.data || [];
+                    renderTable(currentData);
+                    updateStats(currentData);
+                } else {
+                    // API调用失败时，打开原系统页面
+                    alert('API查询失败，将打开原系统页面进行查询\n\n错误信息: ' + (result.message || '未知错误'));
+                    window.open(`https://chajian.kimd.cn:9999/#/wms/produceManage/ppbomEntry?parameterStr=`, '_blank');
+                }
+            } catch (error) {
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('searchBtn').disabled = false;
+                alert('网络错误: ' + error.message);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const table = document.getElementById('dataTable');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!data || data.length === 0) {
+                table.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p').textContent = '未找到相关物料数据';
+                document.getElementById('resultCount').textContent = '';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            table.classList.remove('hidden');
+            document.getElementById('resultCount').textContent = `共 ${data.length} 条记录`;
+
+            tbody.innerHTML = data.map((item, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.FBillNo || item.FICMOBillNo || '-'}</td>
+                    <td>${item.FProjectNumber || '-'}</td>
+                    <td>${item.FProductName || '-'}</td>
+                    <td>${item.FMaterialNumber || '-'}</td>
+                    <td>${item.FMaterialName || '-'}</td>
+                    <td>${item.FModel || '-'}</td>
+                    <td>${item.FQty || 0}</td>
+                    <td>${item.FStockQty || 0}</td>
+                    <td>${item.FPickMtrlQty || 0}</td>
+                    <td>${item.FActualQty || 0}</td>
+                    <td>${getStatusTag(item.FArrivalStatus || item.FInStatus)}</td>
+                    <td>${getStatusTag(item.FPickingStatus || item.FStatus)}</td>
+                    <td>${item.FUnit || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusTag(status) {
+            if (!status) return '<span class="status-tag info">-</span>';
+
+            let className = 'info';
+            if (status.includes('完成') || status.includes('已') || status === '用库存') {
+                className = 'success';
+            } else if (status.includes('部分')) {
+                className = 'warning';
+            } else if (status.includes('未') || status.includes('待')) {
+                className = 'danger';
+            }
+
+            return `<span class="status-tag ${className}">${status}</span>`;
+        }
+
+        function updateStats(data) {
+            const total = data.length;
+            let completed = 0;
+            let partial = 0;
+            let pending = 0;
+
+            data.forEach(item => {
+                const status = item.FPickingStatus || item.FStatus || '';
+                if (status.includes('完成')) {
+                    completed++;
+                } else if (status.includes('部分')) {
+                    partial++;
+                } else {
+                    pending++;
+                }
+            });
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statCompleted').textContent = completed;
+            document.getElementById('statPartial').textContent = partial;
+            document.getElementById('statPending').textContent = pending;
+        }
+
+        function resetSearch() {
+            document.getElementById('workOrderNo').value = '';
+            document.getElementById('materialCode').value = '';
+            document.getElementById('materialName').value = '';
+            document.getElementById('pickingStatus').value = '';
+
+            document.getElementById('dataTable').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('emptyState').querySelector('p').textContent = '请输入工单号进行查询';
+            document.getElementById('resultCount').textContent = '';
+
+            document.getElementById('statTotal').textContent = '0';
+            document.getElementById('statCompleted').textContent = '0';
+            document.getElementById('statPartial').textContent = '0';
+            document.getElementById('statPending').textContent = '0';
+
+            currentData = [];
+        }
+
+        function exportData() {
+            if (currentData.length === 0) {
+                alert('暂无数据可导出');
+                return;
+            }
+
+            // 创建CSV内容
+            const headers = ['序号', '生产任务单号', '工单号', '产品名称', '物料代码', '物料名称', '规格型号', '计划数量', '库存数量', '备料数量', '实际领料', '来料状态', '领料状态', '单位'];
+            const rows = currentData.map((item, index) => [
+                index + 1,
+                item.FBillNo || item.FICMOBillNo || '',
+                item.FProjectNumber || '',
+                item.FProductName || '',
+                item.FMaterialNumber || '',
+                item.FMaterialName || '',
+                item.FModel || '',
+                item.FQty || 0,
+                item.FStockQty || 0,
+                item.FPickMtrlQty || 0,
+                item.FActualQty || 0,
+                item.FArrivalStatus || item.FInStatus || '',
+                item.FPickingStatus || item.FStatus || '',
+                item.FUnit || ''
+            ]);
+
+            const csvContent = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            // 添加BOM以支持中文
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `物料执行明细_${document.getElementById('workOrderNo').value}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 历史记录
+        function saveHistory(workOrderNo) {
+            let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            history = history.filter(item => item !== workOrderNo);
+            history.unshift(workOrderNo);
+            history = history.slice(0, 10);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const container = document.getElementById('historyTags');
+            const section = document.getElementById('historySection');
+
+            if (history.length > 0) {
+                section.style.display = 'block';
+                container.innerHTML = history.map(item =>
+                    `<span class="history-tag" onclick="fillAndSearch('${item}')">${item}</span>`
+                ).join('');
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function fillAndSearch(workOrderNo) {
+            document.getElementById('workOrderNo').value = workOrderNo;
+            search();
+        }
+    </script>
+</body>
+
+</html>

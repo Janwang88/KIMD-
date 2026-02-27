@@ -1,0 +1,18 @@
+{
+  "name": "material-query-tool",
+  "version": "1.0.0",
+  "description": "物料执行情况查询工具 - 通过工单号查询生产投料单明细",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "express": "^4.18.2",
+    "https-proxy-agent": "^7.0.2",
+    "node-fetch": "^2.7.0",
+    "puppeteer": "^24.37.5",
+    "xlsx": "^0.18.5"
+  }
+}

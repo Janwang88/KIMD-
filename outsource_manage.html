@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理中心</title>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --warning: #ea580c;
+            --danger: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+            --radius: 6px;
+            --shadow: 4px 4px 0px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Layout */
+        .sidebar {
+            width: 180px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            font-weight: 800;
+            font-size: 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1e293b;
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Common Components */
+        h2 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f8fafc;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: #fef2f2;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Panels & Tables */
+        .panel {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--card-border);
+            margin-bottom: 24px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            width: 300px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            background: var(--card-bg);
+            border-collapse: collapse;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* Form & Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            width: 600px;
+            max-width: 90%;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Auth specific */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e2e8f0;
+            display: inline-block;
+        }
+
+        .tag.admin {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .tag.user {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* 批量操作条 */
+        .batch-toolbar {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .batch-info {
+            font-size: 14px;
+            color: #475569;
+            font-weight: 600;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <!-- 左侧导航 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            🗄️ 数据核心
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" id="nav-outsource" onclick="switchTab('outsource')">
+                ⏱️ 外借工时数据
+            </div>
+            <div class="nav-item" id="nav-auth" onclick="switchTab('auth')">
+                ⚙️ 系统权限管理
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <button class="btn" style="width: 100%;" onclick="window.close()">关闭此页返回看板</button>
+        </div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="main-content">
+
+        <!-- Tab: 外借工时数据 -->
+        <div id="panel-outsource" class="tab-panel active">
+            <h2>外借人力数据库管理</h2>
+
+            <div class="toolbar">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索工单号、姓名或项目..."
+                        onkeyup="if(event.key==='Enter') loadData()" style="width: 200px;">
+                    <input type="date" id="searchDate" class="search-input" onchange="loadData()" title="按工作日期筛选">
+                    <button class="btn" onclick="loadData()">🔍 搜索</button>
+                    <button class="btn" style="color:var(--text-muted); border-color:var(--border);"
+                        onclick="document.getElementById('searchInput').value=''; document.getElementById('searchDate').value=''; loadData();">清空</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" onclick="downloadTemplate()"
+                        style="color: var(--primary); border-color: var(--primary);">📄 下载模板</button>
+                    <button class="btn" onclick="handleExcelImport()"
+                        style="background: var(--success); color: white; border-color: var(--success);">📥 批量导入
+                        (Excel/CSV)</button>
+                    <button class="btn btn-primary" onclick="openModal()">➕ 新增一行</button>
+                </div>
+            </div>
+
+            <!-- 批量操作条 -->
+            <div id="batchToolbar" class="batch-toolbar">
+                <div class="batch-info">
+                    ✨ 已选中 <span id="selectedCount" style="color: var(--primary);">0</span> 项记录
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn" style="color: var(--primary); border-color: var(--primary);"
+                        onclick="openBatchEditModal()">
+                        ✏️ 批量修改 (工艺/备注)
+                    </button>
+                    <button class="btn" style="color: #ef4444; border-color: #ef4444;" onclick="batchDeleteRecords()">
+                        🗑️ 批量删除选中
+                    </button>
+                    <button class="btn" onclick="clearSelection()"
+                        style="border: none; background: transparent;">取消</button>
+                </div>
+            </div>
+
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="40"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                        <th>ID</th>
+                        <th>日期</th>
+                        <th>工单号</th>
+                        <th>项目名称</th>
+                        <th>姓名</th>
+                        <th>等级</th>
+                        <th>上下班时间</th>
+                        <th>工时(H)</th>
+                        <th>外协单位</th>
+                        <th>属性</th>
+                        <th>工时挂靠</th>
+                        <th>备注/说明</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <span id="pageInfo">共 0 条记录</span>
+                <div>
+                    <button class="btn" onclick="changePage(-1)" style="padding: 4px 12px;">上一页</button>
+                    <span id="currentPage" style="margin: 0 12px; font-weight: 600;">1</span>
+                    <button class="btn" onclick="changePage(1)" style="padding: 4px 12px;">下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: 权限管理 -->
+        <div id="panel-auth" class="tab-panel">
+            <h2>系统权限与账号分配</h2>
+
+            <div class="layout-grid">
+                <div class="panel">
+                    <h3 id="authFormTitle" style="margin-top: 0; margin-bottom: 20px; font-size: 16px;">新增系统授权</h3>
+                    <form id="authForm" onsubmit="addAuth(event)">
+                        <div class="form-group">
+                            <label>登录账号 (全小写英文字母推荐)</label>
+                            <input type="text" id="aCode" placeholder="例如: zhangsan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>真实姓名</label>
+                            <input type="text" id="aName" placeholder="例如: 张三" required>
+                        </div>
+                        <div class="form-group">
+                            <label>登录密码</label>
+                            <input type="text" id="aPass" placeholder="默认设置">
+                        </div>
+                        <div class="form-group">
+                            <label>部门分类</label>
+                            <select id="aDept">
+                                <option value="组装">组装</option>
+                                <option value="接线">接线</option>
+                                <option value="工程">工程</option>
+                                <option value="PMC">PMC</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label>角色分配</label>
+                            <select id="aRole">
+                                <option value="user">普通查阅/操作员</option>
+                                <option value="admin">管理员 (拥有授权控制权)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">分配新账号</button>
+                        <button type="button" class="btn" style="width: 100%; margin-top: 8px; display: none;"
+                            id="cancelEditBtn" onclick="resetAuthForm()">取消编辑</button>
+                    </form>
+                </div>
+
+                <div style="background: transparent;">
+                    <table style="box-shadow: none;">
+                        <thead>
+                            <tr>
+                                <th>登录账号</th>
+                                <th>姓名</th>
+                                <th>部门归属</th>
+                                <th>权限等级</th>
+                                <th>授权日期</th>
+                                <th width="80">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                    载入中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 新增/编辑 工时记录 Modal -->
+    <div class="modal-overlay" id="recordModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="modalTitle">新增记录</span>
+                <button class="btn" style="border:none; padding:4px;" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="recordId">
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>日期</label>
+                    <input type="text" id="f_work_date" placeholder="如 1/8">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>工单号</label>
+                    <input type="text" id="f_work_order">
+                </div>
+                <div class="form-group full" style="margin-bottom: 0;">
+                    <label>项目名称</label>
+                    <input type="text" id="f_project_name">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>姓名</label>
+                    <input type="text" id="f_worker_name">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>等级</label>
+                    <input type="text" id="f_worker_level" placeholder="大工/中工/小工">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>上班时间</label>
+                    <input type="time" id="f_start_time" step="1800" onblur="ensureHalfHour(this)"
+                        onchange="calcHours()">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>下班时间</label>
+                    <input type="time" id="f_end_time" step="1800" onblur="ensureHalfHour(this)" onchange="calcHours()">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>工时 (自动计算)</label>
+                    <input type="text" id="f_hours" value="0" readonly
+                        style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: transparent;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>外协单位</label>
+                    <input type="text" id="f_supplier">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>工时挂靠</label>
+                    <select id="f_content">
+                        <option value="">-- 请选择 --</option>
+                        <option value="模组组装">模组组装</option>
+                        <option value="整机接气">整机接气</option>
+                        <option value="出货">出货</option>
+                        <option value="项目管理">项目管理</option>
+                        <option value="领料">领料</option>
+                        <option value="上线准备">上线准备</option>
+                        <option value="总装">总装</option>
+                        <option value="清洁">清洁</option>
+                        <option value="打包">打包</option>
+                        <option value="电控配线">电控配线</option>
+                        <option value="整机接线">整机接线</option>
+                        <option value="通电通气">通电通气</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>备注/说明</label>
+                    <input type="text" id="f_remark1" placeholder="原有工作内容或新备注">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>属性</label>
+                    <select id="f_category" onchange="handleManageCategoryChange()">
+                        <option value="外协">外协</option>
+                        <option value="KIMD">KIMD</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>外协单位</label>
+                    <input type="text" id="f_supplier" placeholder="如: 外协 / 某某公司">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>班次</label>
+                    <input type="text" id="f_shift">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量修改弹窗 -->
+    <div class="modal-overlay" id="batchEditOverlay">
+        <div class="modal" style="width: 450px;">
+            <div class="modal-header">
+                <div class="modal-title" style="font-weight: 800; font-size: 18px;">✏️ 批量修改选中项</div>
+                <button class="btn" style="border:none; padding:4px;" onclick="closeBatchEditModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>工时挂靠 (统一修改为)</label>
+                    <select id="batchField_content">
+                        <option value="">-- 保持原样 (不做修改) --</option>
+                        <option value="模组组装">模组组装</option>
+                        <option value="整机接气">整机接气</option>
+                        <option value="出货">出货</option>
+                        <option value="项目管理">项目管理</option>
+                        <option value="领料">领料</option>
+                        <option value="上线准备">上线准备</option>
+                        <option value="总装">总装</option>
+                        <option value="清洁">清洁</option>
+                        <option value="打包">打包</option>
+                        <option value="电控配线">电控配线</option>
+                        <option value="整机接线">整机接线</option>
+                        <option value="通电通气">通电通气</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注/说明 (统一修改为)</label>
+                    <input type="text" id="batchField_remark1" placeholder="留空则不修改">
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin-top: 12px;">注：未选中的字段将保持原有数值不变。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeBatchEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveBatchEdit()">立即应用</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 门禁检查
+        const stored = localStorage.getItem('currentUser');
+        if (!stored) {
+            alert('权限不足，请先登录系统');
+            location.href = 'index.html';
+        } else {
+            const u = JSON.parse(stored);
+            if (u.userCode !== 'wangjian' && u.role !== 'admin') {
+                alert('权限不足，仅管理员可访问后台数据');
+                location.href = 'index.html';
+            }
+        }
+
+        function ensureHalfHour(input) {
+            if (!input.value) return;
+            let [h, m] = input.value.split(':').map(Number);
+            // 向下取整：不满半小时不计
+            if (m < 30) {
+                m = 0;
+            } else {
+                m = 30;
+            }
+            const newVal = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+            if (input.value !== newVal) {
+                input.value = newVal;
+                if (typeof calcHours === 'function') calcHours();
+            }
+        }
+
+        // 页面切页
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('nav-' + tabId).classList.add('active');
+            document.getElementById('panel-' + tabId).classList.add('active');
+
+            if (tabId === 'auth') {
+                loadUsers();
+            } else {
+                loadData();
+            }
+        }
+
+        // ======= 外借人力数据逻辑 =======
+        let currentPage = 1;
+
+        // 自动计算工时 (配合用户 Excel 公式逻辑)
+        function calcHours() {
+            const stValue = document.getElementById('f_start_time').value;
+            const etValue = document.getElementById('f_end_time').value;
+            const hoursEl = document.getElementById('f_hours');
+
+            // 1. 如果结束时间为空 (Excel: G369="")
+            if (!etValue) {
+                hoursEl.value = "等待计算";
+                return;
+            }
+
+            // 2. 如果开始时间为空
+            if (!stValue) {
+                hoursEl.value = "0";
+                return;
+            }
+
+            const [h1, m1] = stValue.split(':').map(Number);
+            const [h2, m2] = etValue.split(':').map(Number);
+
+            // 3. 如果开始时间小时 > 11 (Excel: HOUR(F369)>11)
+            if (h1 > 11) {
+                hoursEl.value = "特殊";
+                return;
+            }
+
+            // 4. 计算原始时长 (小时为单位)
+            let rawHours = (h2 + m2 / 60) - (h1 + m1 / 60);
+            if (rawHours < 0) rawHours += 24; // 跨天补齐
+
+            // 5. 根据时长扣除 (Excel 逻辑: HOUR(G369-F369))
+            const durationHourPart = Math.floor(rawHours + 0.0001);
+
+            let finalHours = rawHours;
+            if (durationHourPart <= 3) {
+                finalHours = rawHours;
+            } else if (durationHourPart >= 4 && durationHourPart <= 9) {
+                finalHours = rawHours - 1;
+            } else {
+                finalHours = rawHours - 1.5;
+            }
+
+            hoursEl.value = finalHours.toFixed(1);
+        }
+
+        function handleManageCategoryChange() {
+            const cat = document.getElementById('f_category').value;
+            const levelEl = document.getElementById('f_worker_level');
+            const supplierEl = document.getElementById('f_supplier');
+
+            if (cat === 'KIMD') {
+                levelEl.value = '';
+                levelEl.disabled = true;
+                levelEl.style.background = '#f1f5f9';
+
+                supplierEl.value = '';
+                supplierEl.disabled = true;
+                supplierEl.style.background = '#f1f5f9';
+            } else {
+                levelEl.disabled = false;
+                levelEl.style.background = 'white';
+
+                supplierEl.disabled = false;
+                supplierEl.style.background = 'white';
+            }
+        }
+
+        async function loadData() {
+            const keyword = document.getElementById('searchInput').value;
+            const searchDateRaw = document.getElementById('searchDate').value;
+            let formattedDate = '';
+            if (searchDateRaw) {
+                const parts = searchDateRaw.split('-');
+                if (parts.length === 3) {
+                    // 转成 2/25 的无前导零格式
+                    formattedDate = parseInt(parts[1], 10) + '/' + parseInt(parts[2], 10);
+                }
+            }
+
+            try {
+                const res = await fetch(`/api/outsource-records?page=${currentPage}&pageSize=20&keyword=${encodeURIComponent(keyword)}&searchDate=${encodeURIComponent(formattedDate)}`);
+                const result = await res.json();
+
+                if (result.success) {
+                    renderTable(result.data);
+                    document.getElementById('pageInfo').innerText = `共 ${result.total} 条记录`;
+                    document.getElementById('currentPage').innerText = currentPage;
+                } else {
+                    alert('获取数据失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('加载报错:', err);
+                alert('数据加载异常: ' + err.message);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding: 40px; color:#94a3b8;">没有找到相关记录</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => `
+        <tr data-id="${item.id}">
+          <td style="text-align:center;"><input type="checkbox" class="row-checkbox" value="${item.id}" onclick="updateSelectedCount()"></td>
+          <td style="color:#64748b; font-size:12px;">#${item.id}</td>
+          <td>${item.work_date || '-'}</td>
+          <td style="font-family:monospace; font-weight:600;">${item.work_order || '-'}</td>
+          <td>${item.project_name || '-'}</td>
+          <td style="font-weight:600;">${item.worker_name || '-'}</td>
+          <td>${item.worker_level || '-'}</td>
+          <td style="color:#64748b; font-size:12px; font-family:monospace;">${item.start_time || '-'} ~ ${item.end_time || '-'}</td>
+          <td style="color:var(--primary); font-weight:700;">${item.hours}</td>
+          <td>${item.supplier || '-'}</td>
+          <td><span class="tag" style="background:${item.category === 'KIMD' ? '#fee2e2' : '#dbeafe'}; color:${item.category === 'KIMD' ? '#b91c1c' : '#1d4ed8'};">${item.category || '外协'}</span></td>
+          <td><span class="tag" style="background:#e2e8f0; color:#475569;">${item.content || '未指定'}</span></td>
+          <td>${item.remark1 || '-'}</td>
+          <td>
+            <button class="btn" style="padding:4px 8px; font-size:12px;" onclick="editRecord(this.getAttribute('data-item'))" data-item='${JSON.stringify(item).replace(/'/g, "&#39;")}'>编辑</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteRecord(${item.id})">删除</button>
+          </td>
+        </tr>
+      `).join('');
+
+            // 重置全选框
+            document.getElementById('selectAll').checked = false;
+            updateSelectedCount();
+        }
+
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            const count = checked.length;
+            document.getElementById('selectedCount').innerText = count;
+            document.getElementById('batchToolbar').style.display = count > 0 ? 'flex' : 'none';
+            // 如果不是所有行都选中，全选框取消钩
+            const all = document.querySelectorAll('.row-checkbox');
+            if (all.length > 0) {
+                document.getElementById('selectAll').checked = (count === all.length);
+            }
+        }
+
+        function clearSelection() {
+            document.getElementById('selectAll').checked = false;
+            toggleSelectAll(document.getElementById('selectAll'));
+        }
+
+        async function batchDeleteRecords() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            const ids = Array.from(checked).map(cb => parseInt(cb.value));
+            if (ids.length === 0) return;
+
+            if (confirm(`确定要批量删除选中的 ${ids.length} 条记录吗？警告：此操作不可撤销。`)) {
+                try {
+                    const res = await fetch('/api/outsource-record/batch-delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert(data.message);
+                        loadData();
+                    } else {
+                        alert('批量删除失败: ' + data.message);
+                    }
+                } catch (e) { alert('网络错误'); }
+            }
+        }
+
+        function openBatchEditModal() {
+            document.getElementById('batchEditOverlay').style.display = 'flex';
+            document.getElementById('batchField_content').value = '';
+            document.getElementById('batchField_remark1').value = '';
+        }
+
+        function closeBatchEditModal() {
+            document.getElementById('batchEditOverlay').style.display = 'none';
+        }
+
+        async function saveBatchEdit() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            const ids = Array.from(checked).map(cb => parseInt(cb.value));
+            const newContent = document.getElementById('batchField_content').value;
+            const newRemark = document.getElementById('batchField_remark1').value.trim();
+
+            if (!newContent && !newRemark) {
+                alert('请至少填写一个修改项');
+                return;
+            }
+
+            const payload = { ids };
+            if (newContent) payload.content = newContent;
+            if (newRemark) payload.remark1 = newRemark;
+
+            try {
+                const res = await fetch('/api/outsource-record/batch-update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    closeBatchEditModal();
+                    loadData();
+                } else {
+                    alert('批量修改失败: ' + data.message);
+                }
+            } catch (e) { alert('网络错误'); }
+        }
+
+        function changePage(delta) {
+            if (currentPage + delta > 0) {
+                currentPage += delta;
+                loadData();
+            }
+        }
+
+        function openModal(itemObj = null) {
+            document.getElementById('recordModal').style.display = 'flex';
+            const fields = ['id', 'work_date', 'work_order', 'project_name', 'worker_name', 'worker_level', 'start_time', 'end_time', 'hours', 'supplier', 'content', 'shift', 'remark1', 'category'];
+
+            if (itemObj) {
+                document.getElementById('modalTitle').innerText = '编辑记录';
+                document.getElementById('recordId').value = itemObj.id;
+                fields.forEach(f => {
+                    if (f !== 'id') {
+                        let val = itemObj[f] || '';
+                        // 修正 type="time" 输入框只认 "HH:MM" 且必须补零的问题
+                        if ((f === 'start_time' || f === 'end_time') && val && val !== '-') {
+                            const parts = val.split(':');
+                            if (parts.length >= 2) {
+                                val = parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+                            }
+                        }
+                        // 处理之前保存的 '-' 伪时分，避免写入 time 输入框造成错误
+                        if ((f === 'start_time' || f === 'end_time') && val === '-') {
+                            val = '';
+                        }
+                        document.getElementById('f_' + f).value = val;
+                    }
+                });
+            } else {
+                document.getElementById('modalTitle').innerText = '新增记录';
+                document.getElementById('recordId').value = '';
+                fields.forEach(f => {
+                    if (f !== 'id') document.getElementById('f_' + f).value = '';
+                });
+                document.getElementById('f_hours').value = '0';
+            }
+            handleManageCategoryChange();
+        }
+
+        function closeModal() {
+            document.getElementById('recordModal').style.display = 'none';
+        }
+
+        async function saveRecord() {
+            const id = document.getElementById('recordId').value;
+            const name = document.getElementById('f_worker_name').value.trim();
+            const content = document.getElementById('f_content').value;
+            const category = document.getElementById('f_category').value;
+            const level = document.getElementById('f_worker_level').value;
+
+            if (!name) {
+                alert("请输入人员姓名");
+                return;
+            }
+            if (!content) {
+                alert("请选择工时挂靠（工艺）");
+                return;
+            }
+            if (category === '外协' && !level) {
+                alert("外协人员必须填写/选择等级");
+                return;
+            }
+
+            const payload = {
+                work_date: document.getElementById('f_work_date').value,
+                work_order: document.getElementById('f_work_order').value,
+                project_name: document.getElementById('f_project_name').value,
+                worker_name: document.getElementById('f_worker_name').value,
+                worker_level: document.getElementById('f_worker_level').value,
+                start_time: document.getElementById('f_start_time').value,
+                end_time: document.getElementById('f_end_time').value,
+                hours: isNaN(parseFloat(document.getElementById('f_hours').value)) ? 0 : parseFloat(document.getElementById('f_hours').value),
+                supplier: document.getElementById('f_supplier').value,
+                content: document.getElementById('f_content').value,
+                remark1: document.getElementById('f_remark1').value,
+                shift: document.getElementById('f_shift').value,
+                category: document.getElementById('f_category').value
+            };
+
+            const url = id ? `/api/outsource-record/${id}` : `/api/outsource-record`;
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if (data.success) { closeModal(); loadData(); } else { alert('保存失败: ' + data.message); }
+            } catch (e) { alert('网络错误'); }
+        }
+
+        async function deleteRecord(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                try {
+                    const res = await fetch(`/api/outsource-record/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) loadData(); else alert('删除失败');
+                } catch (e) { alert('网络错误'); }
+            }
+        }
+
+        function editRecord(itemStr) {
+            try {
+                const item = JSON.parse(itemStr);
+                openModal(item);
+            } catch (e) {
+                alert('解析记录数据失败');
+            }
+        }
+
+
+        // ======= 权限账号逻辑 =======
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/auth/users').then(r => r.json());
+                if (!res.success) return alert("读取账号列表失败");
+                const tb = document.getElementById('userList');
+                if (res.data.length === 0) {
+                    tb.innerHTML = '<tr><td colspan="6" align="center" style="padding: 40px;">仅有内置账号</td></tr>';
+                    return;
+                }
+                tb.innerHTML = res.data.map(u => `
+          <tr ondblclick="editUserAuth('${u.userCode}', '${u.userName}', '${u.department}', '${u.role}')" style="cursor: pointer;" title="双击修改记录">
+            <td><strong>${u.userCode}</strong></td>
+            <td>${u.userName}</td>
+            <td><span class="tag" style="background:#f1f5f9; color:#475569;">${u.department || '未分配'}</span></td>
+            <td><span class="tag ${u.role === 'admin' ? 'admin' : 'user'}">${u.role === 'admin' ? '系统超管' : '操作员'}</span></td>
+            <td style="color:#64748b; font-size:12px">${new Date(u.createdAt).toLocaleString()}</td>
+            <td>
+              ${u.userCode === 'wangjian' ? '<span style="color:#cbd5e1;font-size:12px">原生保留</span>' : `<button class="btn btn-danger" style="padding: 4px 8px; font-size:12px" onclick="delUser('${u.userCode}')">移除</button>`}
+            </td>
+          </tr>
+        `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function addAuth(e) {
+            e.preventDefault();
+            const payload = {
+                userCode: document.getElementById('aCode').value.trim(),
+                userName: document.getElementById('aName').value.trim(),
+                password: document.getElementById('aPass').value,
+                role: document.getElementById('aRole').value,
+                department: document.getElementById('aDept').value
+            };
+
+            try {
+                const res = await fetch('/api/auth/addUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res.success) {
+                    document.getElementById('authForm').reset();
+                    resetAuthForm();
+                    loadUsers();
+                } else {
+                    alert(`操作失败: ${res.message}`);
+                }
+            } catch (error) { alert("网络错误"); }
+        }
+
+        function editUserAuth(code, name, dept, role) {
+            if (code === 'wangjian') return alert('内置大管理员账号受保护不可修改');
+            document.getElementById('aCode').value = code;
+            document.getElementById('aCode').readOnly = true;
+            document.getElementById('aCode').style.background = '#f1f5f9';
+            document.getElementById('aName').value = name || '';
+            document.getElementById('aPass').value = '';
+            document.getElementById('aPass').placeholder = '置空则不修改密码';
+            document.getElementById('aDept').value = dept || '组装';
+            document.getElementById('aRole').value = role || 'user';
+            document.querySelector('#authForm button[type="submit"]').textContent = '💾 保存修改';
+            document.getElementById('authFormTitle').innerHTML = '✏️ 修改系统授权: <strong>' + code + '</strong>';
+            document.getElementById('cancelEditBtn').style.display = 'block';
+        }
+
+        function resetAuthForm() {
+            document.getElementById('aCode').readOnly = false;
+            document.getElementById('aCode').style.background = '';
+            document.getElementById('aPass').placeholder = '默认设置';
+            document.querySelector('#authForm button[type="submit"]').textContent = '分配新账号';
+            document.getElementById('authFormTitle').textContent = '新增系统授权';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('authForm').reset();
+        }
+
+        async function delUser(code) {
+            if (!confirm(`你确定要吊销 ${code} 的访问权限吗？`)) return;
+            const res = await fetch(`/api/auth/users/${encodeURIComponent(code)}`, { method: 'DELETE' }).then(r => r.json());
+            if (res.success) loadUsers(); else alert("吊销失败：" + res.message);
+        }
+        // ======= Excel 导入相关功能 =======
+        function downloadTemplate() {
+            if (typeof XLSX === 'undefined') return alert('库尚未加载完成，请稍后再试');
+            const worksheet = XLSX.utils.json_to_sheet([{
+                "日期": "2026/02/25",
+                "工单号": "WORK-001",
+                "项目名称": "测试项目",
+                "姓名": "张三",
+                "等级": "大工",
+                "上班时间": "08:00",
+                "下班时间": "17:30",
+                "工时": 9.5,
+                "外协单位": "某某公司",
+                "工时挂靠": "模组组装",
+                "备注/说明": "原有内容或新备注",
+                "班次": "白班"
+            }]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "导入模板");
+            XLSX.writeFile(workbook, "外借人力导入模板.xlsx");
+        }
+
+        function handleExcelImport() {
+            if (typeof XLSX === 'undefined') return alert('库尚未加载完成，请稍后再试');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx, .xls, .csv';
+            input.style.display = 'none';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    try {
+                        const data = evt.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+
+                        if (json.length === 0) return alert('空文件或未找到数据');
+
+                        const records = json.map(row => {
+                            return {
+                                work_date: (row['日期'] || row['Date'] || '').toString(),
+                                work_order: (row['工单号'] || row['工单'] || row['Order'] || '').toString(),
+                                project_name: (row['项目名称'] || row['项目'] || row['Project'] || '').toString(),
+                                worker_name: (row['姓名'] || row['员工姓名'] || row['Name'] || '').toString(),
+                                worker_level: (row['等级'] || row['级别'] || row['Level'] || '').toString(),
+                                start_time: (row['上班时间'] || row['开始时间'] || row['Start'] || '').toString(),
+                                end_time: (row['下班时间'] || row['结束时间'] || row['End'] || '').toString(),
+                                hours: parseFloat(row['工时'] || row['投入工时'] || row['Hours'] || 0) || 0,
+                                supplier: (row['外协单位'] || row['单位'] || row['Supplier'] || '').toString(),
+                                content: (row['工时挂靠'] || row['工作性质'] || row['工作内容'] || row['Content'] || '').toString(),
+                                remark1: (row['备注/说明'] || row['备注'] || row['原工作内容'] || row['Remark'] || '').toString(),
+                                shift: (row['班次'] || row['Shift'] || '').toString()
+                            };
+                        }).filter(r => r.work_order || r.worker_name); // 过滤空行
+
+                        if (records.length === 0) return alert('未找到有效的记录(至少包含工单号或姓名)');
+
+                        if (confirm(`解析成功！共发现 ${records.length} 条有效记录，是否立即导入？`)) {
+                            fetch('/api/outsource-record/import', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ records })
+                            }).then(r => r.json()).then(res => {
+                                if (res.success) {
+                                    alert(`🎈 导入成功！共新增 ${res.count} 条记录。`);
+                                    loadData();
+                                } else {
+                                    alert('导入失败: ' + res.message);
+                                }
+                            }).catch(err => {
+                                alert('网络错误或服务器异常');
+                            });
+                        }
+                    } catch (err) {
+                        alert('解析 Excel 文件出错: ' + err.message);
+                    }
+                };
+                reader.readAsBinaryString(file);
+            };
+            document.body.appendChild(input);
+            input.click();
+            document.body.removeChild(input);
+        }
+
+        // 初始化默认 Tab 数据
+        loadData();
+    </script>
+</body>
+
+</html>

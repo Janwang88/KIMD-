@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生产排程表格</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --ink: #1f1f1f;
+      --muted: #6b7280;
+      --accent: #1557b0;
+      --line: #e5e7eb;
+      --assemble: #3b82f6;
+      --debug: #f59e0b;
+      --ship: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .field { min-width: 220px; flex: 1; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      padding: 9px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary { background: #e5e7eb; color: #111827; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #1557b0;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 13px;
+    }
+
+    .gantt-wrap {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .table-wrap {
+      overflow: auto;
+      max-height: 720px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: #fff;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f9fafb;
+      z-index: 1;
+      font-weight: 600;
+      font-size: 13px;
+      color: #111827;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    thead th.sortable { cursor: pointer; }
+    thead th.sortable:hover { background: #f3f4f6; }
+    tbody td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #111827;
+      white-space: nowrap;
+    }
+    tbody tr:hover { background: #f8fafc; }
+
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>生产排程表格</h1>
+  </div>
+
+  <div class="container">
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label>账号</label>
+          <input id="userCode" placeholder="请输入账号" />
+        </div>
+        <div class="field">
+          <label>密码</label>
+          <input id="password" type="password" placeholder="请输入密码" />
+        </div>
+        <div class="field">
+          <label>公司（可选）</label>
+          <input id="company" placeholder="昆山龙雨智能科技有限公司" />
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-primary" onclick="login()">登录</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div class="field">
+          <label>KIMD Cookie（自动注入）</label>
+          <input id="kimdCookie" placeholder="从 KIMD 网络请求里复制 Cookie 整行" />
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-secondary" onclick="setCookie()">保存Cookie</button>
+        </div>
+      </div>
+      <div class="hint">登录后才可拉取生产排程数据（服务端会保存登录会话）。</div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label>手动工单号查询（精确匹配）</label>
+          <input id="manualWorkOrder" placeholder="如 N.F-005122602M105007" />
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-primary" onclick="queryManualWorkOrder()">查询工单</button>
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-secondary" onclick="clearExcelCache()">清空Excel缓存</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div class="field">
+          <label>每页数量</label>
+          <input id="pageSize" type="number" value="200" />
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-primary" onclick="fetchSchedule()">抓取数据</button>
+        </div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-secondary" onclick="renderGantt()">重新渲染</button>
+        </div>
+      </div>
+      <div class="hint" id="status">未抓取数据</div>
+      <div class="hint">点击表格中的工单号可打开“物料执行情况明细”页面并自动带入工单号。</div>
+    </div>
+
+    <div class="panel" style="display:none;">
+      <div class="row">
+        <div class="field">
+          <label>Excel 文件关键字（默认：物料）</label>
+          <input id="excelPattern" value="物料" />
+        </div>
+        <div class="field" style="min-width: 180px; flex: 0 0 auto;">
+          <button class="btn-primary" onclick="calcFromExcel()">读取最新Excel统计</button>
+        </div>
+        <div class="field" style="min-width: 180px; flex: 0 0 auto;">
+          <button class="btn-secondary" onclick="clearExcelCache()">清空Excel缓存</button>
+        </div>
+      </div>
+      <div class="hint" id="excelStatus">未读取Excel</div>
+      <div class="hint" id="excelResult"></div>
+    </div>
+
+    <div class="panel" id="mappingPanel" style="display:none;">
+      <div class="row">
+        <div class="field"><label>工单号字段</label><select id="mapWorkOrder"></select></div>
+        <div class="field"><label>项目名称字段</label><select id="mapProject"></select></div>
+        <div class="field"><label>接单时间字段</label><select id="mapOrderDate"></select></div>
+        <div class="field"><label>组装计划开始</label><select id="mapAssyStart"></select></div>
+        <div class="field"><label>组装计划结束</label><select id="mapAssyEnd"></select></div>
+        <div class="field"><label>调试计划开始</label><select id="mapDebugStart"></select></div>
+        <div class="field"><label>调试计划结束</label><select id="mapDebugEnd"></select></div>
+        <div class="field"><label>出货计划结束</label><select id="mapShipEnd"></select></div>
+        <div class="field" style="min-width: 160px; flex: 0 0 auto;">
+          <button class="btn-primary" onclick="applyMapping()">应用映射</button>
+        </div>
+      </div>
+      <div class="hint">如果字段没有自动匹配，请手动选择后点击“应用映射”。</div>
+    </div>
+
+    <div class="panel" id="watchPanel">
+      <div class="row">
+        <div class="field">
+          <label>关注工单</label>
+          <div class="hint">勾选“关注”后将记录到日志，并在此处显示</div>
+        </div>
+      </div>
+      <div id="watchList" class="hint">暂无关注工单</div>
+    </div>
+
+    <div class="gantt-wrap" id="ganttWrap">
+      <div class="table-wrap" id="ganttBody">
+        <div class="empty">暂无数据</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      raw: [],
+      mapped: [],
+      mapping: {
+        workOrder: '',
+        project: '',
+        orderDate: '',
+        assyStart: '',
+        assyEnd: '',
+        debugStart: '',
+        debugEnd: '',
+        shipEnd: ''
+      },
+      sortKey: 'orderDate',
+      sortDir: 'desc',
+      watchlist: {}
+    };
+    window.state = state;
+    const KIMD_BASE_URL = 'https://chajian.kimd.cn:9999';
+    const STATS_BASE_URL = `${location.origin}/material_stats.html`;
+    const MATERIAL_TABLE_CODE = 'V_WMS_MaterialProgres';
+
+    function setStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    async function setCookie() {
+      const cookie = document.getElementById('kimdCookie').value.trim();
+      if (!cookie) {
+        setStatus('请先粘贴 KIMD Cookie');
+        return;
+      }
+      try {
+        const res = await fetch('/api/set-cookie', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookie })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('kimd_cookie', cookie);
+          setStatus('Cookie 已保存');
+        } else {
+          setStatus(`保存失败：${data.message || '未知错误'}`);
+        }
+      } catch (err) {
+        setStatus(`保存异常：${err.message}`);
+      }
+    }
+
+    async function autoSetCookie() {
+      const cookie = localStorage.getItem('kimd_cookie');
+      if (!cookie) return;
+      document.getElementById('kimdCookie').value = cookie;
+      try {
+        const res = await fetch('/api/set-cookie', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookie })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setStatus('Cookie 已自动注入');
+        }
+      } catch (e) {
+        // 静默失败，用户可手动点保存
+      }
+    }
+
+    async function login() {
+      const userCode = document.getElementById('userCode').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const company = document.getElementById('company').value.trim();
+
+      if (!userCode || !password) {
+        setStatus('请输入账号和密码');
+        return;
+      }
+
+      setStatus('登录中...');
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userCode, password, company })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setStatus(`登录成功：${data.data.userName}`);
+        } else {
+          setStatus(`登录失败：${data.message || '未知错误'}`);
+        }
+      } catch (err) {
+        setStatus(`登录异常：${err.message}`);
+      }
+    }
+
+    async function fetchSchedule() {
+      const pageSize = Number(document.getElementById('pageSize').value || 200);
+
+      setStatus('抓取中...');
+      try {
+        const res = await fetch('/api/production-schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workOrderNo: '', pageIndex: 1, pageSize })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          setStatus(`抓取失败：${data.message || '未知错误'}`);
+          return;
+        }
+        state.raw = Array.isArray(data.data) ? data.data : [];
+        setStatus(`抓取成功：${state.raw.length} 条`);
+        prepareMapping();
+        const mappingPanel = document.getElementById('mappingPanel');
+        if (mappingPanel) mappingPanel.style.display = 'none';
+      } catch (err) {
+        setStatus(`抓取异常：${err.message}`);
+      }
+    }
+
+    function normalizeDate(value) {
+      if (!value) return '';
+      if (typeof value === 'string') {
+        const m = value.match(/\d{4}[-\/]\d{2}[-\/]\d{2}/);
+        if (m) return m[0].replace(/\//g, '-');
+      }
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) {
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${d.getFullYear()}-${mm}-${dd}`;
+      }
+      return '';
+    }
+
+    function prepareMapping() {
+      const panel = document.getElementById('mappingPanel');
+      if (!state.raw.length) {
+        panel.style.display = 'none';
+        return;
+      }
+      const keys = Object.keys(state.raw[0] || {});
+      const selects = {
+        mapWorkOrder: 'workOrder',
+        mapProject: 'project',
+        mapOrderDate: 'orderDate',
+        mapAssyStart: 'assyStart',
+        mapAssyEnd: 'assyEnd',
+        mapDebugStart: 'debugStart',
+        mapDebugEnd: 'debugEnd',
+        mapShipEnd: 'shipEnd'
+      };
+
+      Object.entries(selects).forEach(([id]) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="">请选择字段</option>' + keys.map(k => `<option value="${k}">${k}</option>`).join('');
+      });
+
+      const guess = {
+        workOrder: guessKey(keys, ['BillNo', '工单', '工單', '工号', '工號', 'FProjectNumber', 'FWorkOrder', 'FMO', 'WorkOrder', 'ProjectNumber']),
+        project: guessKey(keys, ['ItemName', '项目', '專案', 'ProjectName', 'FProjectName', 'FName']),
+        orderDate: guessKey(keys, ['BillDate_SYSDateTemp', '接单', '接單', 'OrderDate', 'FOrderDate', 'FReceive', 'FRecDate']),
+        assyStart: guessKey(keys, ['ZZPStartTime', '组装计划开始', '組裝計劃開始', 'AssemblyStart', 'AssyStart', 'FAssyStart', 'FAssemblyStart', 'FAssembleStart']),
+        assyEnd: guessKey(keys, ['ZZPEndTime', '组装计划结束', '組裝計劃結束', 'AssemblyEnd', 'AssyEnd', 'FAssyEnd', 'FAssemblyEnd', 'FAssembleEnd']),
+        debugStart: guessKey(keys, ['GCTSPStartTime', '调试计划开始', '調試計劃開始', 'DebugStart', 'FDebugStart']),
+        debugEnd: guessKey(keys, ['GCTSPEndTime', '调试计划结束', '調試計劃結束', 'DebugEnd', 'FDebugEnd']),
+        shipEnd: guessKey(keys, ['CHPEndTime', '出货计划结束', '出貨計劃結束', 'ShipEnd', 'Delivery', 'FDelivery', 'FShip', 'FShipDate'])
+      };
+
+      Object.entries(selects).forEach(([id, key]) => {
+        const sel = document.getElementById(id);
+        if (guess[key]) sel.value = guess[key];
+      });
+
+      panel.style.display = 'block';
+      applyMapping();
+    }
+
+    function guessKey(keys, patterns) {
+      for (const k of keys) {
+        for (const p of patterns) {
+          if (k === p || k.includes(p)) return k;
+        }
+      }
+      return '';
+    }
+
+    function applyMapping() {
+      state.mapping = {
+        workOrder: document.getElementById('mapWorkOrder').value,
+        project: document.getElementById('mapProject').value,
+        orderDate: document.getElementById('mapOrderDate').value,
+        assyStart: document.getElementById('mapAssyStart').value,
+        assyEnd: document.getElementById('mapAssyEnd').value,
+        debugStart: document.getElementById('mapDebugStart').value,
+        debugEnd: document.getElementById('mapDebugEnd').value,
+        shipEnd: document.getElementById('mapShipEnd').value
+      };
+
+      state.mapped = state.raw.map(row => ({
+        workOrder: row[state.mapping.workOrder] || '',
+        project: row[state.mapping.project] || '',
+        orderDate: normalizeDate(row[state.mapping.orderDate]),
+        assyStart: normalizeDate(row[state.mapping.assyStart]),
+        assyEnd: normalizeDate(row[state.mapping.assyEnd]),
+        debugStart: normalizeDate(row[state.mapping.debugStart]),
+        debugEnd: normalizeDate(row[state.mapping.debugEnd]),
+        shipEnd: normalizeDate(row[state.mapping.shipEnd])
+      }));
+
+      renderGantt();
+    }
+
+    function renderGantt() {
+      const body = document.getElementById('ganttBody');
+
+      let rows = state.mapped.filter(r => r.workOrder || r.project);
+      if (!rows.length) {
+        body.innerHTML = '<div class="empty">暂无可展示数据</div>';
+        return;
+      }
+
+      const hasAnyDate = rows.some(r => r.orderDate || r.assyStart || r.assyEnd || r.debugStart || r.debugEnd || r.shipEnd);
+      if (!hasAnyDate) {
+        body.innerHTML = '<div class="empty">未找到有效日期字段，请检查字段映射</div>';
+        return;
+      }
+
+      rows = sortRows(rows);
+      const count = rows.length;
+
+      body.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>关注</th>
+              ${renderSortTh('workOrder', `工单号 (${count})`)}
+              ${renderSortTh('project', '项目名称')}
+              ${renderSortTh('orderDate', '接单时间')}
+              ${renderSortTh('assyStart', '组装计划开始')}
+              ${renderSortTh('assyEnd', '组装计划结束')}
+              ${renderSortTh('debugStart', '调试计划开始')}
+              ${renderSortTh('debugEnd', '调试计划结束')}
+              ${renderSortTh('shipEnd', '出货计划结束')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>
+                  ${r.workOrder ? `<input type="checkbox" class="watch-toggle" data-workorder="${escapeHtml(r.workOrder)}" data-project="${escapeHtml(r.project || '')}" ${state.watchlist[r.workOrder] ? 'checked' : ''} />` : ''}
+                </td>
+                <td>${r.workOrder ? `<button class="link-btn" data-workorder="${escapeHtml(r.workOrder)}" data-project="${escapeHtml(r.project || '')}" onclick="openMaterialPages(this.dataset.workorder, this.dataset.project)">${escapeHtml(r.workOrder)}</button>` : '-'}</td>
+                <td>${escapeHtml(r.project || '')}</td>
+                <td>${r.orderDate || '-'}</td>
+                <td>${r.assyStart || '-'}</td>
+                <td>${r.assyEnd || '-'}</td>
+                <td>${r.debugStart || '-'}</td>
+                <td>${r.debugEnd || '-'}</td>
+                <td>${r.shipEnd || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function sortRows(rows) {
+      const key = state.sortKey;
+      const dir = state.sortDir === 'desc' ? -1 : 1;
+      return [...rows].sort((a, b) => {
+        const av = a[key] || '';
+        const bv = b[key] || '';
+        if (key.endsWith('Date') || key.endsWith('Start') || key.endsWith('End') || key.includes('Date')) {
+          const ad = av ? new Date(av).getTime() : 0;
+          const bd = bv ? new Date(bv).getTime() : 0;
+          return (ad - bd) * dir;
+        }
+        return String(av).localeCompare(String(bv)) * dir;
+      });
+    }
+
+    function renderSortTh(key, label) {
+      const isActive = state.sortKey === key;
+      const arrow = isActive ? (state.sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+      return `<th class="sortable" data-key="${key}">${label}${arrow}</th>`;
+    }
+
+    document.addEventListener('click', (e) => {
+      const th = e.target.closest('th.sortable');
+      if (!th) return;
+      const key = th.getAttribute('data-key');
+      if (!key) return;
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortKey = key;
+        state.sortDir = 'asc';
+      }
+      renderGantt();
+    });
+
+    document.addEventListener('change', (e) => {
+      const cb = e.target.closest('input.watch-toggle');
+      if (!cb) return;
+      const workOrder = cb.getAttribute('data-workorder') || '';
+      const project = cb.getAttribute('data-project') || '';
+      if (!workOrder) return;
+      if (cb.checked) {
+        state.watchlist[workOrder] = { workOrder, project, ts: Date.now() };
+        logWatch('add', workOrder, project);
+      } else {
+        delete state.watchlist[workOrder];
+        logWatch('remove', workOrder, project);
+      }
+      saveWatchlist();
+      renderWatchlist();
+    });
+
+    function openMaterialPages(workOrder, project) {
+      const statsUrl = `${STATS_BASE_URL}?workOrder=${encodeURIComponent(workOrder)}&project=${encodeURIComponent(project || '')}&t=${Date.now()}`;
+      window.open(statsUrl, '_blank');
+      const safeWorkOrder = (workOrder || '').replace(/'/g, "''");
+      // 保留精确匹配，同时追加 LIKE 兼容旧版 Tampermonkey 对工单提取的正则
+      const filterRaw = ` AND 工单 = '${safeWorkOrder}' AND 工单 LIKE '%${safeWorkOrder}%'`;
+      const filterEncoded = encodeURIComponent(filterRaw);
+      const parameterStr = encodeURIComponent(JSON.stringify({
+        filterDic: {
+          pageSize: 50,
+          page: 1,
+          orderKey: '制单日期 DESC',
+          filter: filterEncoded,
+          detail1FilterStr: '',
+          detail2FilterStr: '',
+          detail3FilterStr: '',
+          detail4FilterStr: '',
+          detail5FilterStr: ''
+        },
+        tableCode: MATERIAL_TABLE_CODE
+      }));
+      const kimdUrl = `${KIMD_BASE_URL}/#/wms/reportManage/materialProgres?parameterStr=${parameterStr}&workOrder=${encodeURIComponent(workOrder)}&project=${encodeURIComponent(project || '')}&t=${Date.now()}`;
+      window.open(kimdUrl, 'kimdMaterial');
+    }
+
+    function queryManualWorkOrder() {
+      const workOrder = document.getElementById('manualWorkOrder').value.trim();
+      if (!workOrder) {
+        setStatus('请输入完整工单号');
+        return;
+      }
+      openMaterialPages(workOrder, '');
+    }
+
+    function loadWatchlist() {
+      try {
+        const raw = localStorage.getItem('watchlist');
+        if (raw) {
+          state.watchlist = JSON.parse(raw) || {};
+        }
+      } catch (e) {
+        state.watchlist = {};
+      }
+    }
+
+    function saveWatchlist() {
+      localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+    }
+
+    function renderWatchlist() {
+      const box = document.getElementById('watchList');
+      const items = Object.values(state.watchlist || {});
+      if (!items.length) {
+        box.textContent = '暂无关注工单';
+        return;
+      }
+      box.innerHTML = items.map(i => `
+        <div>
+          <button class="link-btn" data-workorder="${escapeHtml(i.workOrder)}" data-project="${escapeHtml(i.project || '')}" onclick="openMaterialPages(this.dataset.workorder, this.dataset.project)">
+            ${escapeHtml(i.workOrder)}
+          </button>
+          ${i.project ? ` - ${escapeHtml(i.project)}` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function logWatch(action, workOrder, project) {
+      try {
+        await fetch('/api/watchlist-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, workOrder, project })
+        });
+      } catch (e) {
+        // 忽略日志失败
+      }
+    }
+
+    async function calcFromExcel() {
+      const status = document.getElementById('excelStatus');
+      const result = document.getElementById('excelResult');
+      const pattern = document.getElementById('excelPattern').value.trim() || '物料';
+      status.textContent = '读取中...';
+      result.textContent = '';
+      try {
+        const res = await fetch('/api/excel-material-stats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pattern })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          status.textContent = `读取失败：${data.message || '未知错误'}`;
+          return;
+        }
+        const s = data.stats || {};
+        status.textContent = `读取成功：${data.file || ''}（行 ${s.rows || 0}，唯一料号 ${s.uniqueTotal || 0}）`;
+        result.textContent = `标准件：${s.stdTotal || 0}  加工件：${s.procTotal || 0}`;
+      } catch (e) {
+        status.textContent = `读取失败：${e.message}`;
+      }
+    }
+
+    async function clearExcelCache() {
+      const status = document.getElementById('excelStatus');
+      const result = document.getElementById('excelResult');
+      status.textContent = '清理中...';
+      result.textContent = '';
+      try {
+        const res = await fetch('/api/excel-clear-cache', { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) {
+          status.textContent = `清理失败：${data.message || '未知错误'}`;
+          return;
+        }
+        status.textContent = '已清空Excel缓存';
+      } catch (e) {
+        status.textContent = `清理失败：${e.message}`;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    document.addEventListener('DOMContentLoaded', autoSetCookie);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadWatchlist();
+      renderWatchlist();
+    });
+  </script>
+</body>
+</html>

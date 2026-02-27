@@ -1,0 +1,308 @@
+{
+  "rows": 849,
+  "uniqueTotal": 567,
+  "stdTotal": 281,
+  "procTotal": 286,
+  "stdRows": 404,
+  "procRows": 445,
+  "stdDelivered": 275,
+  "procDelivered": 264,
+  "stdUndelivered": 6,
+  "procUndelivered": 22,
+  "undeliveredList": [
+    {
+      "partNo": "1.08.10.00605",
+      "name": "耐磨贴",
+      "model": "ZK.02.04.135",
+      "qty": 4,
+      "type": "标准件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "1.03.03.00189",
+      "name": "反射光电",
+      "model": "MGV101B14F3",
+      "qty": 60,
+      "type": "标准件",
+      "deliveredRows": 4,
+      "totalRows": 5,
+      "actualDays": 10
+    },
+    {
+      "partNo": "7.01.201566B-B030-X2",
+      "name": "限位块",
+      "model": "AL6061",
+      "qty": 168,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 3,
+      "actualDays": 10
+    },
+    {
+      "partNo": "7.01.201566B-B130-X1",
+      "name": "限位块",
+      "model": "AL6061",
+      "qty": 144,
+      "type": "加工件",
+      "deliveredRows": 1,
+      "totalRows": 2,
+      "actualDays": 4
+    },
+    {
+      "partNo": "7.01.201566B-M007-X1",
+      "name": "缓冲块",
+      "model": "S45C",
+      "qty": 8,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M013-X1",
+      "name": "压紧板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 8
+    },
+    {
+      "partNo": "7.01.201566B-M009-X1",
+      "name": "气缸固定块",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 6
+    },
+    {
+      "partNo": "7.01.201566B-M006-X1",
+      "name": "活动板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 8
+    },
+    {
+      "partNo": "7.01.201566B-M012-X1",
+      "name": "托板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M017-X1",
+      "name": "浮动接头",
+      "model": "S45C",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 9
+    },
+    {
+      "partNo": "7.01.201566B-M003-X1",
+      "name": "推拉底板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 8
+    },
+    {
+      "partNo": "7.01.201566B-M002-X1",
+      "name": "支撑板",
+      "model": "AL6061",
+      "qty": 8,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M014-X1",
+      "name": "挡块",
+      "model": "AL6061",
+      "qty": 8,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 6
+    },
+    {
+      "partNo": "7.02.202566C-M016-X1",
+      "name": "拖链钣金",
+      "model": "SUS304",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 13
+    },
+    {
+      "partNo": "7.01.201566B-M004-X1",
+      "name": "立板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 8
+    },
+    {
+      "partNo": "7.01.201566B-M011-X1",
+      "name": "缓冲挡块",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 6
+    },
+    {
+      "partNo": "7.01.201566B-M005-X1",
+      "name": "缓冲固定块",
+      "model": "S45C",
+      "qty": 8,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 8
+    },
+    {
+      "partNo": "7.01.201566B-M010-X1",
+      "name": "连接块",
+      "model": "S45C",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M001-X1",
+      "name": "固定板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M008-X1",
+      "name": "缓冲垫块",
+      "model": "S45C",
+      "qty": 8,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 7
+    },
+    {
+      "partNo": "7.01.201566B-M015-X1",
+      "name": "推拉底板",
+      "model": "AL6061",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 6
+    },
+    {
+      "partNo": "7.02.202566C-M018-X1",
+      "name": "安装钣金",
+      "model": "SUS304",
+      "qty": 4,
+      "type": "加工件",
+      "deliveredRows": 2,
+      "totalRows": 4,
+      "actualDays": 11
+    },
+    {
+      "partNo": "7.01.201566B-D113-X4",
+      "name": "精密载座",
+      "model": "AL6061+ESD米色PEEK",
+      "qty": 32,
+      "type": "加工件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "7.01.201566B-D121-X4",
+      "name": "精密载座",
+      "model": "AL6061+ESD米色PEEK",
+      "qty": 32,
+      "type": "加工件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "3.05.01.00045",
+      "name": "棕色线",
+      "model": "18AWG",
+      "qty": 5,
+      "type": "标准件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "1.14.08.00013",
+      "name": "无磁R0.5圆头针",
+      "model": "300-04445-001",
+      "qty": 350,
+      "type": "标准件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "1.15.05.00150",
+      "name": "FFU 空气净化单元",
+      "model": "DFU-T16-S3-W",
+      "qty": 8,
+      "type": "标准件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    },
+    {
+      "partNo": "1.01.02.00250",
+      "name": "流量控制器",
+      "model": "PFCA711-C6-1-S",
+      "qty": 64,
+      "type": "标准件",
+      "deliveredRows": 0,
+      "totalRows": 1,
+      "actualDays": null
+    }
+  ],
+  "onTimeOk": 656,
+  "onTimeNg": 193,
+  "onTimeChecked": 849,
+  "pendingIqc": 5,
+  "onTimeRate": 77.27,
+  "totalOrderQty": 4,
+  "cycleStats": {
+    "stdOk": 216,
+    "stdNg": 60,
+    "stdAvg": 7.2,
+    "procOk": 89,
+    "procNg": 195,
+    "procAvg": 8.7
+  }
+}

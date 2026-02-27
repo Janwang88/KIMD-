@@ -1,0 +1,16 @@
+[
+  {
+    "userCode": "wangjian",
+    "password": "123",
+    "userName": "王俭",
+    "role": "admin"
+  },
+  {
+    "userCode": "zhangsan",
+    "password": "123",
+    "userName": "张三",
+    "role": "user",
+    "department": "组装",
+    "createdAt": "2026-02-25T13:21:50.773Z"
+  }
+]

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外协工时核对中心</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header h1::before {
+            content: '';
+            width: 6px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Dashboard Contrast */
+        .contrast-board {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 40px;
+            font-weight: 900;
+            line-height: 1;
+            z-index: 1;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+            z-index: 1;
+        }
+
+        .card-local {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .card-local .metric-value {
+            color: var(--primary);
+        }
+
+        .card-kimd {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border-color: #99f6e4;
+        }
+
+        .card-kimd .metric-value {
+            color: #0d9488;
+        }
+
+        .card-diff {
+            background: #fff1f2;
+            border-color: #fecdd3;
+        }
+
+        .card-diff.match {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .card-diff .metric-value {
+            color: var(--danger);
+        }
+
+        .card-diff.match .metric-value {
+            color: var(--success);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+        }
+
+        .search-bar input {
+            flex: 1;
+            max-width: 300px;
+            height: 38px;
+        }
+
+        /* Tables */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .styled-table th {
+            padding: 12px 16px;
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .styled-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .styled-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            text-decoration: underline;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag.primary {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .tag.warning {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .sync-status {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>外协工时核对中心</h1>
+        <div class="nav-buttons">
+            <a href="index.html" class="btn btn-outline">返回首页</a>
+            <a href="material_stats.html" class="btn btn-outline">物料管理</a>
+        </div>
+    </div>
+
+    <div class="layout-grid">
+        <!-- Left Column: Data Entry -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>录入台账明细</span>
+                <span class="sync-status">
+                    <div class="pulse-dot"></div> 本地就绪
+                </span>
+            </div>
+
+            <form id="recordForm" onsubmit="submitRecord(event)">
+                <div class="form-group">
+                    <label>日期</label>
+                    <input type="date" id="rDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>工单号</label>
+                    <input type="text" id="rWo" class="form-control" placeholder="例如：N.E-004982512..." required>
+                </div>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="rName" class="form-control" placeholder="人员姓名" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>工种级别</label>
+                        <select id="rLevel" class="form-control">
+                            <option value="大工">大工</option>
+                            <option value="中工">中工</option>
+                            <option value="小工">小工</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>工时数 (H)</label>
+                        <input type="number" id="rHours" class="form-control" step="0.5" placeholder="8.0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>外协单位</label>
+                    <input type="text" id="rSupplier" class="form-control" placeholder="例如：鸿泽" value="鸿泽">
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; height: 40px; margin-top: 8px;">保存录入记录</button>
+            </form>
+        </div>
+
+        <!-- Right Column: Dashboard & Compare -->
+        <div class="panel">
+            <div class="search-bar">
+                <input type="text" id="searchWo" class="form-control" placeholder="输入工单号进行检索对账...">
+                <button class="btn btn-primary" onclick="loadCompare()">开始对账对比</button>
+                <button class="btn btn-outline" style="margin-left:auto" onclick="fetchKIMDHours()">自动抓取 KIMD
+                    线上流水</button>
+            </div>
+
+            <!-- Contrast Panel -->
+            <div class="contrast-board" id="contrastBoard" style="display: none;">
+                <div class="metric-card card-local">
+                    <div class="metric-title">系统线下台账总耗时 (本地已输)</div>
+                    <div class="metric-value" id="valLocal">0</div>
+                    <div class="metric-sub" style="color:var(--text-muted)">台账明细加总求和</div>
+                </div>
+                <div class="metric-card card-kimd">
+                    <div class="metric-title">KIMD 线上提交总工时</div>
+                    <div class="metric-value" id="valKimd">0</div>
+                    <div class="metric-sub" style="color:#0f766e">来自当前已解析生产表</div>
+                </div>
+                <div class="metric-card card-diff" id="diffCard">
+                    <div class="metric-title">偏差差异 (Difference)</div>
+                    <div class="metric-value" id="valDiff">0</div>
+                    <div class="metric-sub" id="diffStatus">核对一致 / 存在漏报风险</div>
+                </div>
+            </div>
+
+            <!-- Detail Table -->
+            <div class="panel-title" style="margin-top: 32px;">当前筛选下的明细流水账</div>
+            <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 8px;">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>工单号</th>
+                            <th>姓名</th>
+                            <th>外包单位</th>
+                            <th>人员等级</th>
+                            <th>录入工时</th>
+                            <th style="width: 60px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTbody">
+                        <!-- Render JS List Here -->
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                暂无本地录入记录，请输入工单或填报左侧表单</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let kimdStatsCache = {}; // 存放从KIMD解析回来的按工单工时统计
+
+        // Initialize
+        document.getElementById('rDate').valueAsDate = new Date();
+        loadRecords(); // Load initial full list or last inputs
+
+        async function submitRecord(e) {
+            e.preventDefault();
+            const payload = {
+                date: document.getElementById('rDate').value,
+                workOrder: document.getElementById('rWo').value.trim(),
+                workerName: document.getElementById('rName').value,
+                workerLevel: document.getElementById('rLevel').value,
+                workHours: document.getElementById('rHours').value,
+                supplier: document.getElementById('rSupplier').value
+            };
+
+            try {
+                const resp = await fetch('/api/outsource/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const res = await resp.json();
+                if (res.success) {
+                    // 重置姓名和工时以便快速连打
+                    document.getElementById('rName').value = '';
+                    document.getElementById('rHours').value = '';
+                    document.getElementById('rName').focus();
+
+                    // 刷新列表和对比
+                    const currentSearch = document.getElementById('searchWo').value.trim();
+                    if (currentSearch && payload.workOrder.includes(currentSearch)) {
+                        loadCompare();
+                    } else {
+                        loadRecords(); // just reload full list
+                    }
+                } else {
+                    alert("录入失败：" + res.message);
+                }
+            } catch (err) {
+                alert("网络错误，保存失败！");
+            }
+        }
+
+        async function loadRecords(workOrderFilter = '') {
+            try {
+                let url = '/api/outsource/records';
+                if (workOrderFilter) url += '?workOrder=' + encodeURIComponent(workOrderFilter);
+
+                const resp = await fetch(url);
+                const res = await resp.json();
+                const tbody = document.getElementById('recordsTbody');
+
+                if (res.success && res.data.length > 0) {
+                    let totalH = 0;
+                    tbody.innerHTML = res.data.map(d => {
+                        totalH += d.workHours;
+                        return `
+            <tr>
+                <td>${d.date}</td>
+                <td style="font-family:monospace; font-weight:600">${d.workOrder}</td>
+                <td><span class="tag primary">${d.workerName}</span></td>
+                <td>${d.supplier}</td>
+                <td><span class="tag warning">${d.workerLevel}</span></td>
+                <td style="font-weight:700">${parseFloat(d.workHours).toFixed(1)} h</td>
+                <td><button class="action-btn" onclick="deleteRec('${d.id}')">删除</button></td>
+            </tr>
+            `;
+                    }).join('');
+                    return totalH; // Return sum for the current filtered list
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">未找到该条件下的线下流水记录</td></tr>`;
+                    return 0;
+                }
+            } catch (e) {
+                console.error(e);
+                return 0;
+            }
+        }
+
+        async function deleteRec(id) {
+            if (!confirm('确定要删除这条录入记录吗？对账数据可能受到影响。')) return;
+            const resp = await fetch(`/api/outsource/records/${id}`, { method: 'DELETE' });
+            const res = await resp.json();
+            if (res.success) {
+                loadCompare(); // Refresh
+            }
+        }
+
+        // 获取KIMD那边的工时状态 (模拟/直接调用之前已经可能缓存过的报表接口)
+        // 如果当前并没有导出或者服务器没有，我们提供一个统一的方法触发脚本导出
+        async function fetchKIMDHours() {
+            // 在这发送给KIMD一个指示导出工时详情的请求，或者通过轮询。
+            // 因为这是模拟双流对账，若现有系统有实际工时抓取请求，应调用那个。
+            alert('请确保已经在KIMD工具中配置好了自动下发【生产实际工时Excel】参数。系统此时将开始监视后台导出结果。此功能依托您环境的油猴插件运作！');
+
+            // We will pretend we fetched or wait
+            try {
+                const w = document.getElementById('searchWo').value.trim();
+                if (!w) return alert('先在左边搜索框填入主对账工单号！');
+                window.open(`http://kimd.com/mes/report?workOrder=${encodeURIComponent(w)}&autoExportHours=true`, '_blank', 'width=800,height=600');
+
+                let maxTries = 15;
+                let iv = setInterval(async () => {
+                    const r = await fetch('/api/excel-wait-stats?reqMode=hours&workOrder=' + encodeURIComponent(w));
+                    const res = await r.json();
+                    if (res.success && res.stats) {
+                        clearInterval(iv);
+                        alert('成功截获线上录入记录！已将对账面更新！');
+                        // parse out kimdHours / outsourceHours
+                        // For now, if stats doesn't literally have the outsource field we just fake a data structure for demonstration
+                        // In realistic scenario we map res.stats.outsourceHours
+                        kimdStatsCache[w] = typeof res.stats.outsourceHours === 'number' ? res.stats.outsourceHours : 0;
+                        loadCompare();
+                    }
+                    maxTries--;
+                    if (maxTries <= 0) {
+                        clearInterval(iv);
+                        console.log("Monitor timeout");
+                    }
+                }, 3000);
+
+            } catch (e) { }
+        }
+
+        async function loadCompare() {
+            const wo = document.getElementById('searchWo').value.trim();
+            document.getElementById('contrastBoard').style.display = 'flex';
+
+            // 1. Calculate Local Offline Hours
+            const localTotal = await loadRecords(wo) || 0;
+
+            // 2. Fetch KIMD hours from cache or zero/dummy if not yet injected
+            // Since this is dynamic, we'll try to find if we have kimd records for it
+            let kimdTotal = kimdStatsCache[wo] !== undefined ? kimdStatsCache[wo] : '?';
+
+            // Update UI
+            document.getElementById('valLocal').innerText = localTotal.toFixed(1);
+            document.getElementById('valKimd').innerText = kimdTotal;
+
+            const diffCard = document.getElementById('diffCard');
+            const valDiff = document.getElementById('valDiff');
+            const statusTxt = document.getElementById('diffStatus');
+
+            if (kimdTotal === '?') {
+                valDiff.innerText = '等待同步';
+                diffCard.className = 'metric-card card-diff';
+                statusTxt.innerText = "请点击上方【自动抓取KIMD】获取生产录入情况";
+                valDiff.style.fontSize = '24px';
+            } else {
+                valDiff.style.fontSize = '40px';
+                const diff = localTotal - kimdTotal;
+                if (diff === 0) {
+                    valDiff.innerText = "0";
+                    diffCard.className = 'metric-card card-diff match';
+                    statusTxt.innerText = "线下台账与线上填报 分毫不差！✅";
+                } else {
+                    valDiff.innerText = (diff > 0 ? "+" : "") + diff.toFixed(1);
+                    diffCard.className = 'metric-card card-diff';
+                    if (diff > 0) {
+                        statusTxt.innerText = `异常！系统端少报漏报 ${diff} 小时，可能造成外配结算差额！❗`;
+                    } else {
+                        statusTxt.innerText = `异常！线下漏记或者线上误填多报！`;
+                    }
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>

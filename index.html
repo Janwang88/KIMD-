@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工单详细信息看板</title>
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      /* 混凝土亮灰 */
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      /* 明显的粗边框 */
+      --primary: #2563eb;
+      /* 工业蓝 */
+      --primary-glow: transparent;
+      --success: #16a34a;
+      /* 信号绿 */
+      --success-glow: transparent;
+      --warning: #ea580c;
+      /* 安全橙 */
+      --danger: #dc2626;
+      /* 警示红 */
+      --text-main: #0f172a;
+      /* 深黑灰 */
+      --text-muted: #475569;
+      /* 中性灰 */
+      --border: #e2e8f0;
+      --radius: 6px;
+      /* 工业风更锐利的直角边缘 */
+      --shadow: 4px 4px 0px rgba(15, 23, 42, 0.08);
+      /* 机械投影 */
+      --shadow-lg: 6px 6px 0px rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-color);
+      background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.01) 10px, rgba(0, 0, 0, 0.01) 20px);
+      color: var(--text-main);
+      margin: 0;
+      padding: 12px 20px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .header-meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Hero Metrics Dashboard */
+    .hero-dashboard {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr auto;
+      gap: 24px;
+      margin-bottom: 10px;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+      align-items: center;
+    }
+
+    .hero-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      z-index: 1;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .hero-value {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    .hero-value.qty {
+      font-size: 32px;
+      color: var(--primary);
+    }
+
+    /* Compact Controls Navbar */
+    .nav-tools {
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .btn-tool {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s;
+    }
+
+    /* Milestone info strip below hero */
+    .milestone-strip {
+      display: flex;
+      gap: 16px;
+      margin-top: 0;
+      margin-bottom: 10px;
+      background: #f8fafc;
+      border: 1px dashed var(--card-border);
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ms-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ms-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .ms-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      background: var(--bg-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .btn-return {
+      padding: 0 16px;
+      height: 32px;
+      line-height: 32px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .btn-return:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-tool:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .controls-panel-mini {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .controls-panel-mini .control-group {
+      flex: 1;
+      margin: 0;
+    }
+
+    .controls-panel-mini input {
+      height: 32px;
+      padding: 6px 12px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .controls-panel-mini input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Dashboard Grid */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .dash-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .dash-section:hover {
+      border-color: var(--text-muted);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .dash-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .dash-title span {
+      white-space: nowrap;
+    }
+
+    .dash-dot-std {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .dash-dot-proc {
+      width: 8px;
+      height: 8px;
+      background: var(--warning);
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Section Specifics */
+    .section-std {
+      grid-column: span 4;
+    }
+
+    .section-proc {
+      grid-column: span 4;
+    }
+
+    .section-perf {
+      grid-column: span 4;
+    }
+
+    /* Stat Cards within Sections */
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .stat-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* 居中填充中间空白 */
+    }
+
+    .stat-item {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+      font-weight: 400;
+    }
+
+    .donut-chart {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .val.ok {
+      color: var(--success);
+    }
+
+    .val.ng {
+      color: var(--danger);
+    }
+
+    .val.pending {
+      color: var(--warning);
+    }
+
+    .stat-card-box {
+      background: #f8fafc;
+      border: 1px dashed var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: auto;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .stat-card-box:hover {
+      background: #fef2f2;
+      border-color: var(--danger);
+      box-shadow: 4px 4px 0px rgba(220, 38, 38, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .stat-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .stat-card-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--danger);
+    }
+
+    .stat-card-value.success {
+      color: var(--success);
+    }
+
+    /* Donut Chart Enhancements */
+    .donut-chart {
+      position: relative;
+    }
+
+    .donut-ring {
+      transform: rotate(-90deg);
+      transform-origin: center;
+      stroke-linecap: square;
+      /* 工业感平头 */
+      transition: stroke-dasharray 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .percentage {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .percentage-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* Detail Table */
+    .detail-panel {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes blink {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .btn-close {
+      background: var(--bg-color);
+      border: 1px dashed var(--card-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .btn-close:hover {
+      background: #fef2f2;
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .modern-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+
+    .modern-table th {
+      text-align: left;
+      padding: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .modern-table td {
+      padding: 16px;
+      font-size: 14px;
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+
+    .modern-table tr:hover td {
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+
+    /* Status Bar & Scrollbar */
+    .status-bar {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px dashed var(--card-border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    .status-loading .status-dot {
+      background: var(--warning);
+      animation: none;
+    }
+
+    /* ===== Left-side Tab Layout ===== */
+    .tab-layout {
+      display: flex;
+      gap: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: auto;
+    }
+
+    .tab-sidebar {
+      width: 120px;
+      flex-shrink: 0;
+      background: #f8fafc;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 0;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 18px 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .tab-btn .tab-icon {
+      font-size: 22px;
+    }
+
+    .tab-btn:hover {
+      background: #eef2ff;
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      background: #eff6ff;
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 700;
+    }
+
+    .tab-panels {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* === Hours section inside tab === */
+    .hours-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h1 class="page-title">
+          <span class="icon">📦</span>
+          工单详细信息看板
+        </h1>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <x-auth-shield id="authShield" style="display: flex; gap: 12px; align-items: center;">
+            <!-- 会在此处通过 JS 注入权限相关的按钮/标识 -->
+          </x-auth-shield>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Dashboard (The new metrics view) -->
+    <div class="hero-dashboard" id="heroDashboard">
+      <div class="hero-item">
+        <div class="hero-label">工单编号</div>
+        <input type="text" id="workOrder" onkeypress="handleEnter(event)" placeholder="查寻工单..."
+          style="background: #ffffff; border: 2px solid #cbd5e1; border-radius: 8px; color: #1e293b; width: 260px; font-weight: 800; font-size: 20px; outline: none; padding: 8px 12px; transition: border 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);"
+          onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#cbd5e1'" />
+        <div class="hero-value" id="heroWorkOrder" style="display: none;">-</div>
+      </div>
+
+      <div class="hero-item">
+        <div class="hero-label">项目名称</div>
+        <div class="hero-value" id="heroProject">-</div>
+      </div>
+
+      <div class="hero-item">
+        <div class="hero-label">工单数量</div>
+        <div class="hero-value qty" id="heroOrderQty">-</div>
+      </div>
+
+      <div class="hero-item">
+        <div class="hero-label">状态</div>
+        <div class="hero-value" id="heroStatusText">等待中</div>
+      </div>
+      <div class="hero-item" style="display: none;">
+        <div class="hero-label">外协工时 (CSV)</div>
+        <div class="hero-value" id="outsourceCsvTotal" style="color: var(--warning);">-</div>
+      </div>
+
+      <div class="nav-tools"
+        style="display: flex; align-items: center; justify-content: center; margin-left: auto; z-index: 9999; position: relative;">
+        <button id="heroSearchBtn" class="btn-tool" onmousedown="typeof loadData==='function' ? loadData() : null"
+          onclick="typeof loadData==='function' ? loadData() : null"
+          style="background: var(--primary); color: white; border: none; font-weight: 800; font-size: 16px; padding: 12px 24px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); cursor: pointer !important; position: relative; z-index: 9999;">📊
+          统计</button>
+      </div>
+    </div>
+
+    <!-- Milestone strip appended right below hero -->
+    <div class="milestone-strip" id="milestoneStrip" style="display: none;">
+      <div class="ms-item">
+        <span class="ms-label">组装开始:</span>
+        <span class="ms-value" id="msAssemblyStart">-</span>
+      </div>
+      <div class="ms-item">
+        <span class="ms-label">组装结束:</span>
+        <span class="ms-value" id="msAssemblyEnd">-</span>
+      </div>
+      <div class="ms-item" style="margin-left: 12px; border-left: 1px solid var(--border); padding-left: 24px;">
+        <span class="ms-label">调试开始:</span>
+        <span class="ms-value" id="msDebugStart">-</span>
+      </div>
+      <div class="ms-item">
+        <span class="ms-label">调试结束:</span>
+        <span class="ms-value" id="msDebugEnd">-</span>
+      </div>
+      <div class="ms-item" style="margin-left: 12px; border-left: 1px solid var(--border); padding-left: 24px;">
+        <span class="ms-label">出货时间:</span>
+        <span class="ms-value" id="msShipStart" style="color: var(--primary);"></span>
+      </div>
+    </div>
+
+    <!-- Compact Search Panel (Hidden by default or toggled) -->
+    <div class="controls-panel-mini hidden" id="searchPanel" style="display: none !important;">
+      <div class="control-group"></div>
+      <button id="retryBtn" class="btn-primary"
+        style="height: 32px; padding: 0 16px; background: #059669; display: none;" onclick="retryFetch()">📥
+        重新获取数据</button>
+
+      <div id="hiddenConfig" style="display:none;">
+        <input id="stdPrefix" value="非加工件" />
+        <input id="procPrefix" value="7." />
+        <select id="partField"></select>
+        <select id="receiptField"></select>
+      </div>
+    </div>
+
+    <!-- Left-side Tab Layout -->
+    <div class="tab-layout">
+
+      <!-- Sidebar Tab Buttons -->
+      <div class="tab-sidebar">
+        <button class="tab-btn active" id="tabBtn0" onmousedown="switchTab(0)">
+          <span class="tab-icon">📦</span>
+          物料信息
+        </button>
+        <button class="tab-btn" id="tabBtn1" onmousedown="switchTab(1)">
+          <span class="tab-icon">⏱️</span>
+          工时信息
+        </button>
+      </div>
+
+      <!-- Tab Content Panels -->
+      <div class="tab-panels">
+
+        <!-- Panel 0: 物料信息 -->
+        <div class="tab-panel active" id="tabPanel0">
+          <div class="dashboard">
+            <!-- Standard Parts -->
+            <div class="dash-section section-std">
+              <div class="dash-title std" style="align-items: flex-start;">
+                <div
+                  style="display: flex; flex-direction: column; align-items: flex-start; margin-top: 8px; gap: 24px;">
+                  <div style="display: flex; align-items: center;">
+                    <div class="dash-dot-std"></div>
+                    <span>标准件概览</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">总行数</div>
+                    <div style="display: flex; align-items: baseline; gap: 4px;">
+                      <span id="stdRows"
+                        style="font-size: 24px; font-weight: 800; color: var(--text-main); line-height: 1;">-</span>
+                      <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">(<span
+                          id="stdTotal">-</span> 款)</span>
+                    </div>
+                    <div
+                      style="font-size: 11px; color: #94a3b8; font-weight: normal; margin-top: -2px; white-space: nowrap;">
+                      *基于系统导出的行数统计
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
+                  <div
+                    style="display: flex; flex-direction: column; gap: 4px; padding: 4px 10px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.2; text-align: left;">
+                    <div
+                      style="font-size: 11px; color: var(--text-muted); text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 4px; margin-bottom: 2px;">
+                      准时达交</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; color: var(--success); width: 100%;">
+                        <span>OK:</span>
+                        <span id="onTimeOkStd"
+                          style="text-align: right; font-size: 12px; margin-left: 8px; font-weight: bold;">-</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; color: var(--danger); width: 100%;">
+                        <span>NG:</span>
+                        <span id="onTimeNgStd"
+                          style="text-align: right; font-size: 12px; margin-left: 8px; font-weight: bold;">-</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div class="donut-chart" style="width: 70px; height: 70px;">
+                      <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#e2e8f0" stroke-width="3" />
+                        <path id="donutRingStd"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                          stroke="#10b981" stroke-width="3" stroke-dasharray="0, 100" class="donut-ring" />
+                      </svg>
+                    </div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1;"
+                      id="onTimeRateStd">-</div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-card-box" onclick="showUndelivered('std')">
+                <div class="stat-card-title">
+                  <span>未交货明细 (点击查看)<br><small
+                      style="font-size:11px; font-weight:normal; color:#94a3b8;">*按照行数统计</small></span>
+                  <span>↗</span>
+                </div>
+                <div class="stat-card-value" id="stdUndelivered" style="display:flex; align-items:baseline; gap:8px;">-
+                </div>
+              </div>
+            </div>
+
+            <!-- Processed Parts -->
+            <div class="dash-section section-proc">
+              <div class="dash-title proc" style="align-items: flex-start;">
+                <div
+                  style="display: flex; flex-direction: column; align-items: flex-start; margin-top: 8px; gap: 24px;">
+                  <div style="display: flex; align-items: center;">
+                    <div class="dash-dot-proc"></div>
+                    <span>加工件概览</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">总行数</div>
+                    <div style="display: flex; align-items: baseline; gap: 4px;">
+                      <span id="procRows"
+                        style="font-size: 24px; font-weight: 800; color: var(--text-main); line-height: 1;">-</span>
+                      <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">(<span
+                          id="procTotal">-</span> 款)</span>
+                    </div>
+                    <div
+                      style="font-size: 11px; color: #94a3b8; font-weight: normal; margin-top: -2px; white-space: nowrap;">
+                      *基于系统导出的行数统计
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
+                  <div
+                    style="display: flex; flex-direction: column; gap: 4px; padding: 4px 10px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.2; text-align: left;">
+                    <div
+                      style="font-size: 11px; color: var(--text-muted); text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 4px; margin-bottom: 2px;">
+                      准时达交</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; color: var(--success); width: 100%;">
+                        <span>OK:</span>
+                        <span id="onTimeOkProc"
+                          style="text-align: right; font-size: 12px; margin-left: 8px; font-weight: bold;">-</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; color: var(--danger); width: 100%;">
+                        <span>NG:</span>
+                        <span id="onTimeNgProc"
+                          style="text-align: right; font-size: 12px; margin-left: 8px; font-weight: bold;">-</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; color: var(--warning); width: 100%;">
+                        <span>待检:</span>
+                        <span id="pendingIqc"
+                          style="text-align: right; font-size: 12px; margin-left: 8px; font-weight: bold;">-</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div class="donut-chart" style="width: 70px; height: 70px;">
+                      <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#e2e8f0" stroke-width="3" />
+                        <path id="donutRingProc"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                          stroke="#10b981" stroke-width="3" stroke-dasharray="0, 100" class="donut-ring" />
+                      </svg>
+                    </div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1;"
+                      id="onTimeRateProc">-</div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-card-box" onclick="showUndelivered('proc')">
+                <div class="stat-card-title">
+                  <span>未交货明细 (点击查看)<br><small
+                      style="font-size:11px; font-weight:normal; color:#94a3b8;">*按照行数统计</small></span>
+                  <span>↗</span>
+                </div>
+                <div class="stat-card-value" id="procUndelivered" style="display:flex; align-items:baseline; gap:8px;">-
+                </div>
+              </div>
+            </div>
+
+            <!-- Cycle Time Performance -->
+            <div class="dash-section section-perf">
+              <div class="dash-title">采购周期目标达成情况</div>
+              <div class="stat-body" style="flex-direction: column; gap: 16px;">
+                <div style="display: flex; flex-direction: column; width: 100%; gap: 16px;">
+                  <div
+                    style="flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px dashed var(--card-border); border-radius: var(--radius); padding: 16px 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">标准件 10天达成率</div>
+                      <div style="display: flex; gap: 12px; font-size: 12px; margin-top: 4px;">
+                        <span style="color: var(--success); font-weight: 600;">达标: <span id="stdCycleOk"
+                            style="font-weight: 800;">-</span></span>
+                        <span style="color: var(--danger); font-weight: 600;">超期: <span id="stdCycleNg"
+                            style="font-weight: 800;">-</span></span>
+                        <span style="color: var(--text-muted); font-weight: 600;">未交: <span id="stdCycleUn"
+                            style="font-weight: 800;">-</span></span>
+                      </div>
+                    </div>
+                    <div class="donut-chart" style="width: 54px; height: 54px; flex-shrink: 0;">
+                      <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#e2e8f0" stroke-width="3" />
+                        <path id="stdCycleRing"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                          stroke="#10b981" stroke-width="3" stroke-dasharray="0, 100" class="donut-ring" />
+                      </svg>
+                      <div class="donut-center-text">
+                        <div class="percentage" style="font-size: 14px; font-weight: 800; color: var(--text-main);"
+                          id="stdCycleRate">-</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style="flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px dashed var(--card-border); border-radius: var(--radius); padding: 16px 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">加工件 7天达成率</div>
+                      <div style="display: flex; gap: 12px; font-size: 12px; margin-top: 4px;">
+                        <span style="color: var(--success); font-weight: 600;">达标: <span id="procCycleOk"
+                            style="font-weight: 800;">-</span></span>
+                        <span style="color: var(--danger); font-weight: 600;">超期: <span id="procCycleNg"
+                            style="font-weight: 800;">-</span></span>
+                        <span style="color: var(--text-muted); font-weight: 600;">未交: <span id="procCycleUn"
+                            style="font-weight: 800;">-</span></span>
+                      </div>
+                    </div>
+                    <div class="donut-chart" style="width: 54px; height: 54px; flex-shrink: 0;">
+                      <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#e2e8f0" stroke-width="3" />
+                        <path id="procCycleRing"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                          stroke="#10b981" stroke-width="3" stroke-dasharray="0, 100" class="donut-ring" />
+                      </svg>
+                      <div class="donut-center-text">
+                        <div class="percentage" style="font-size: 14px; font-weight: 800; color: var(--text-main);"
+                          id="procCycleRate">-</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END Panel 0 -->
+
+        <!-- Panel 1: 工时信息 -->
+        <div class="tab-panel" id="tabPanel1">
+          <div class="hours-section-header">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #4338ca;">⏱️ 实际工时统计</h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button id="refreshLocalHoursBtn" class="btn-primary"
+                style="background-color: #f59e0b; height: 36px; border: none;" onclick="refreshLocalHours()">
+                <span class="btn-icon">🔄</span> 本地工时刷新
+              </button>
+              <button class="btn-primary" style="background-color: #6366f1; height: 36px;" onclick="loadHoursData()">
+                <span class="btn-icon">⚡</span> 加载工时数据
+              </button>
+            </div>
+          </div>
+          <div id="hoursDashboard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <!-- Assembly Hours -->
+            <div id="hoursAssemblySection" class="dash-section"
+              style="border-top: 4px solid #ef4444; position: relative;">
+              <div class="dash-title" style="color: #dc2626; display: flex; justify-content: space-between;">
+                <span>组装工时 (红)</span>
+                <span id="hoursAssemblyStatusIcon" style="font-size: 16px;"></span>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; margin-bottom: 8px;">
+                <div class="stat-number" id="hoursAssemblyTotal" style="margin-bottom: 0;">-</div>
+                <div class="stat-sub" style="margin-left: 0;">计划: <span id="hoursAssemblyPlan">-</span> | <span
+                    id="hoursAssemblyRate" style="font-weight:bold">-</span>%</div>
+              </div>
+              <div id="hoursAssemblyDetails" style="margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+              </div>
+              <div class="stat-actions"
+                style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                <button class="btn-tool" onclick="openQuickEntry('assembly')"
+                  style="flex: 1; font-size: 11px; padding: 6px;">录入</button>
+                <button class="btn-tool" onclick="openHoursComparison('assembly')"
+                  style="flex: 1; font-size: 11px; padding: 6px; background: #fee2e2; color: #dc2626; border-color: #fca5a5;">查询</button>
+              </div>
+            </div>
+            <!-- Mixed Hours -->
+            <div id="hoursMixedSection" class="dash-section" style="border-top: 4px solid #3b82f6; position: relative;">
+              <div class="dash-title" style="color: #2563eb; display: flex; justify-content: space-between;">
+                <span>混合工时 (蓝)</span>
+                <span id="hoursMixedStatusIcon" style="font-size: 16px;"></span>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; margin-bottom: 8px;">
+                <div class="stat-number" id="hoursMixedTotal" style="margin-bottom: 0;">-</div>
+                <div class="stat-sub" style="margin-left: 0;">计划: <span id="hoursMixedPlan">-</span> | <span
+                    id="hoursMixedRate" style="font-weight:bold">-</span>%</div>
+              </div>
+              <div id="hoursMixedDetails" style="margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+              </div>
+              <div class="stat-actions"
+                style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                <button class="btn-tool" onclick="openQuickEntry('mixed')"
+                  style="flex: 1; font-size: 11px; padding: 6px;">录入</button>
+                <button class="btn-tool" onclick="openHoursComparison('mixed')"
+                  style="flex: 1; font-size: 11px; padding: 6px; background: #dbeafe; color: #2563eb; border-color: #93c5fd;">查询</button>
+              </div>
+            </div>
+            <!-- Wiring Hours -->
+            <div id="hoursWiringSection" class="dash-section"
+              style="border-top: 4px solid #10b981; position: relative;">
+              <div class="dash-title" style="color: #059669; display: flex; justify-content: space-between;">
+                <span>接线工时 (绿)</span>
+                <span id="hoursWiringStatusIcon" style="font-size: 16px;"></span>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; margin-bottom: 8px;">
+                <div class="stat-number" id="hoursWiringTotal" style="margin-bottom: 0;">-</div>
+                <div class="stat-sub" style="margin-left: 0;">计划: <span id="hoursWiringPlan">-</span> | <span
+                    id="hoursWiringRate" style="font-weight:bold">-</span>%</div>
+              </div>
+              <div id="hoursWiringDetails" style="margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+              </div>
+              <div class="stat-actions"
+                style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                <button class="btn-tool" onclick="openQuickEntry('wiring')"
+                  style="flex: 1; font-size: 11px; padding: 6px;">录入</button>
+                <button class="btn-tool" onclick="openHoursComparison('wiring')"
+                  style="flex: 1; font-size: 11px; padding: 6px; background: #dcfce7; color: #059669; border-color: #86efac;">查询</button>
+              </div>
+            </div>
+          </div>
+          <!-- 对比视图区域 -->
+          <div id="hoursComparisonView" style="display: none; margin-top: 24px; animation: fadeIn 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h4 id="comparisonTitle" style="margin: 0; font-size: 15px; color: var(--text-main);">🔍 数据核对：KIMD 系统 vs
+                CSV 数据库</h4>
+              <button class="btn-tool" onclick="closeComparison()">返回整体概览</button>
+            </div>
+            <div id="comparisonContent"
+              style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden;">
+              <!-- 对比表格将在此注入 -->
+            </div>
+          </div>
+
+          <div id="hoursEmpty" style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+            <div style="font-size: 16px; font-weight: 600;">点击“加载工时数据”按钮开始获取该工单的工时数据</div>
+          </div>
+        </div>
+        <!-- END Panel 1 -->
+
+      </div>
+      <!-- END tab-panels -->
+    </div>
+    <!-- END tab-layout -->
+
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      <div id="status">系统就绪，等待输入...</div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel hidden" id="detailPanel">
+      <div class="detail-header">
+        <div class="detail-title" id="detailTitle">未交货明细</div>
+        <button class="btn-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th width="60">序号</th>
+              <th>料号</th>
+              <th>名称</th>
+              <th>规格型号</th>
+              <th width="100" style="text-align:right">数量</th>
+              <th width="140" style="text-align:center">采购回复到料日期</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Entry Panel -->
+    <div class="detail-panel hidden" id="quickEntryPanel" style="margin-top: 24px; max-width: 100%; width: 100%;">
+      <div class="detail-header">
+        <div class="detail-title" id="quickEntryTitle">⚡ 快捷录入</div>
+        <div style="display: flex; gap: 24px; align-items: center;">
+          <div
+            style="display: flex; gap: 8px; align-items: center; background: #f1f5f9; padding: 4px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+            <label style="font-size: 13px; font-weight: 600; color: #475569;">录入日期:</label>
+            <input type="date" id="quickEntryGlobalDate"
+              style="border:none; background:transparent; font-size: 13px; color: var(--primary); font-weight: 700; outline: none;">
+          </div>
+          <div id="quickEntryMeta" style="font-size: 13px; color: var(--text-muted);">工单：-</div>
+          <button class="btn-close" onclick="closeQuickEntry()">✕</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+        <table class="modern-table" style="margin-top: 0; min-width: 1000px;">
+          <thead>
+            <tr>
+              <th width="90">姓名</th>
+              <th width="80">等级</th>
+              <th width="80">属性</th>
+              <th width="100">外协单位</th>
+              <th width="110">工时挂靠</th>
+              <th width="85">时间(起)</th>
+              <th width="85">时间(止)</th>
+              <th width="80">工时(h)</th>
+              <th width="150">备注</th>
+              <th width="100" style="text-align:center">操作</th>
+            </tr>
+          </thead>
+          <tbody id="quickEntryBody">
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 12px; align-items: center;">
+        <span style="font-size: 12px; color: #94a3b8;">* 所有信息均可修改。工时将根据 Excel 公式自动核算并扣除休息。</span>
+        <button class="btn-tool" onclick="addQuickEntryRow()"
+          style="background: #f1f5f9; border-color: #cbd5e1; color: #475569;">➕ 增加行</button>
+        <button class="btn-primary" onclick="saveAllQuickEntries()" style="background: #10b981;">一键保存所有</button>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModalOverlay"
+      style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(4px);">
+      <div
+        style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 360px;">
+        <h2 style="text-align: center; color: #333; margin-top: 0; margin-bottom: 24px;">🔑 系统登录</h2>
+        <div id="loginError"
+          style="display: none; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f;">
+        </div>
+        <div style="margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 13px; font-weight: 600; color: #555;">账号</label>
+          <input type="text" id="modalUserCode" placeholder="请输入账号" value="wangjian"
+            style="padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; outline: none;">
+        </div>
+        <div style="margin-bottom: 24px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 13px; font-weight: 600; color: #555;">密码</label>
+          <input type="password" id="modalPassword" placeholder="请输入密码"
+            style="padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; outline: none;"
+            onkeypress="if(event.key==='Enter') loginUser()">
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button
+            style="flex: 1; padding: 12px 0; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc; color: var(--text-main); font-size: 14px; font-weight: 600; cursor: pointer;"
+            onclick="closeLoginModal()">取 消</button>
+          <button
+            style="flex: 1; padding: 12px 0; border: none; border-radius: 6px; background: var(--primary); color: white; font-size: 14px; font-weight: 600; cursor: pointer;"
+            onclick="loginUser()">登 录</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="material_stats_core.js?v=20250225_v3"></script>
+  <script>
+    console.log('[Stats] HTML entry script active.');
+    // 自动重试启动机制
+    (function runner() {
+      if (typeof bootstrap === 'function') {
+        console.log('[Stats] Core library found, booting...');
+        bootstrap();
+      } else {
+        console.warn('[Stats] Waiting for core library...');
+        setTimeout(runner, 100);
+      }
+    })();
+
+    // 权限与访客拦截器
+    document.addEventListener('DOMContentLoaded', () => {
+      const shield = document.getElementById('authShield');
+      const uStr = localStorage.getItem('currentUser');
+      const cPanel = document.getElementById('searchPanel'); // 旧版查询区域
+      const detailBtn = document.querySelector('.controls-panel-mini'); // 某些旧的区域需要隐藏也行
+
+      if (uStr) {
+        const u = JSON.parse(uStr);
+        // 如果是超级管理员或者是后台授权的 Admin
+        const isAdmin = u.userCode === 'wangjian' || u.role === 'admin';
+        shield.innerHTML = `
+          <span style="color:#0ea5e9; font-weight:600; background:#e0f2fe; padding:4px 12px; border-radius:12px; font-size:13px;">👤 ${u.userName} (${isAdmin ? '管理员' : '授权员工'})</span>
+          ${isAdmin ? '<button class="btn-return" style="background: #ffffff; color: #1a73e8; border-color: #1a73e8;" onclick="window.open(\'物料查询工具.html\', \'_blank\')">🗺️ 项目排程</button>' : ''}
+          <button class="btn-return" style="color:#dc2626; border-color:#fecaca;" onclick="logout()">退出登录</button>
+          ${isAdmin ? '<button class="btn-return" style="background: #ffffff; color: var(--text-main); border-color: var(--border);" onclick="window.open(\'outsource_manage.html\', \'_blank\')">🗄️ 设置与管理中心</button>' : ''}
+        `;
+        // 允许操作面板
+        if (cPanel) cPanel.classList.remove('hidden');
+      } else {
+        // 游客模式
+        shield.innerHTML = `
+          <span style="color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 12px; border-radius:12px; font-size:13px;">👁️ 游客模式 (只读)</span>
+          <button class="btn-return" style="color:var(--primary); border-color:var(--primary);" onclick="openLoginModal()">登 录</button>
+        `;
+        if (cPanel) cPanel.classList.add('hidden');
+      }
+    });
+
+    function openLoginModal() {
+      document.getElementById('loginModalOverlay').style.display = 'flex';
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModalOverlay').style.display = 'none';
+      const el = document.getElementById('loginError');
+      if (el) el.style.display = 'none';
+    }
+
+    async function loginUser() {
+      const userCode = document.getElementById('modalUserCode').value.trim();
+      const password = document.getElementById('modalPassword').value;
+      const errorEl = document.getElementById('loginError');
+
+      if (!userCode || !password) {
+        errorEl.textContent = '请输入账号和密码';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userCode, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const user = { userName: result.data.userName, userCode, role: result.data.role, department: result.data.department };
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          location.reload();
+        } else {
+          errorEl.textContent = result.message || '登录失败';
+          errorEl.style.display = 'block';
+        }
+      } catch (error) {
+        errorEl.textContent = '网络错误，请检查服务是否启动';
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.reload();
+    }
+
+    // 页签切换函数
+    function switchTab(index) {
+      document.querySelectorAll('.tab-btn').forEach(function (btn, i) {
+        btn.classList.toggle('active', i === index);
+      });
+      document.querySelectorAll('.tab-panel').forEach(function (panel, i) {
+        panel.classList.toggle('active', i === index);
+      });
+      // 切换到工时页签时，隐藏未到料明细列表
+      if (index !== 0) {
+        const detailPanel = document.getElementById('detailPanel');
+        if (detailPanel) detailPanel.classList.add('hidden');
+      } else {
+        // 当切换到“物料信息”页签（index === 0）时，隐藏快捷录入面板
+        const quickEntryPanel = document.getElementById('quickEntryPanel');
+        if (quickEntryPanel) quickEntryPanel.classList.add('hidden');
+      }
+    }
+
+    // ★ 重置工时面板回空白状态（换工单时调用）
+    function resetHoursPanel() {
+      const dash = document.getElementById('hoursDashboard');
+      const empty = document.getElementById('hoursEmpty');
+      if (dash) dash.style.display = 'grid';
+      if (empty) empty.style.display = 'none';
+      // 清空各工时数值显示
+      ['hoursAssemblyTotal', 'hoursAssemblyPlan', 'hoursAssemblyRate', 'hoursAssemblyKimd', 'hoursAssemblyOut',
+        'hoursMixedTotal', 'hoursMixedPlan', 'hoursMixedRate', 'hoursMixedKimd', 'hoursMixedOut',
+        'hoursWiringTotal', 'hoursWiringPlan', 'hoursWiringRate', 'hoursWiringKimd', 'hoursWiringOut'
+      ].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '-';
+      });
+      ['tagsAssembly', 'tagsMixed', 'tagsWiring'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+      });
+    }
+
+    // 拦截 loadData（统计按钮调用的函数），查询新工单前重置工时面板
+    var _origLoadData;
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function patchLoadData() {
+        if (typeof loadData === 'function') {
+          _origLoadData = loadData;
+          window.loadData = function () {
+            resetHoursPanel(); // ← 重置工时面板（防止显示旧工单数据）
+            _origLoadData();   // ← 加载物料数据
+          };
+        } else {
+          setTimeout(patchLoadData, 100);
+        }
+      }, 200);
+
+      // ★ 拦截 applyStatsFromMessage —— 物料数据真正写入完成后才触发工时加载
+      // 这是最精准的完成信号，完全避免两个任务同时竞争文件监听器
+      setTimeout(function patchApplyStats() {
+        if (typeof applyStatsFromMessage === 'function') {
+          var _origApply = applyStatsFromMessage;
+          window.applyStatsFromMessage = function (payload) {
+            _origApply(payload); // ← 先执行原始物料数据渲染
+            // 物料已完成，延迟 300ms 再启动工时（让渲染先结束）
+            setTimeout(function () {
+              if (typeof loadHoursData === 'function') {
+                console.log('[AutoFlow] 物料统计完成，自动触发工时加载...');
+                loadHoursData();
+              }
+            }, 300);
+          };
+          console.log('[AutoFlow] applyStatsFromMessage 拦截成功');
+        } else {
+          setTimeout(patchApplyStats, 100);
+        }
+      }, 200);
+
+      // 加载工时数据并显示 hoursDashboard
+      setTimeout(function patchHours() {
+        if (typeof loadHoursData === 'function') {
+          var _orig = loadHoursData;
+          window.loadHoursData = function () {
+            const dash = document.getElementById('hoursDashboard');
+            const empty = document.getElementById('hoursEmpty');
+            if (dash) dash.style.display = 'grid';
+            if (empty) empty.style.display = 'none';
+            _orig();
+          };
+        } else {
+          setTimeout(patchHours, 100);
+        }
+      }, 200);
+    });
+
+    // ======= 本地工时刷新逻辑 =======
+    async function refreshLocalHours() {
+      const wo = document.getElementById('workOrder').value.trim();
+      if (!wo) {
+        alert('请先查询有效的工单号');
+        return;
+      }
+
+      const btn = document.getElementById('refreshLocalHoursBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ 刷新中...';
+      }
+
+      try {
+        const res = await fetch(`/api/outsource-hours?workOrder=${encodeURIComponent(wo)}`);
+        const data = await res.json();
+
+        if (data.success) {
+          // 只更新本地数据状态，不碰系统数据
+          state.csvOutsourceData = data;
+
+          // 重新渲染工时卡片（仅本地数据列和对比图标会变化）
+          if (state.currentStats && state.currentStats.hoursStats) {
+            renderHoursData(state.currentStats.hoursStats);
+          }
+
+          setStatus('本地工时数据已刷新 ✅', false);
+        } else {
+          setStatus('本地工时刷新失败：' + (data.message || '未知错误'), false);
+        }
+      } catch (err) {
+        setStatus('本地工时刷新出错：' + err.message, false);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '🔄 本地工时刷新';
+        }
+      }
+    }
+
+    // ======= 快捷录入逻辑 =======
+    let currentSection = '';
+    let currentWo = '';
+
+    function ensureHalfHour(input) {
+      if (!input.value) return;
+      let [h, m] = input.value.split(':').map(Number);
+      // 向下取整：不到30分算00，超过30分不到60算30
+      if (m < 30) {
+        m = 0;
+      } else {
+        m = 30;
+      }
+      const newVal = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+      if (input.value !== newVal) {
+        input.value = newVal;
+        // 触发计算
+        const rowId = input.closest('tr') ? input.closest('tr').id : null;
+        if (rowId && typeof calcQuickHours === 'function') {
+          calcQuickHours(rowId);
+        } else if (typeof calcHours === 'function') {
+          calcHours();
+        }
+      }
+    }
+
+    async function openQuickEntry(section) {
+      const wo = document.getElementById('workOrder').value || document.getElementById('heroWorkOrder').textContent;
+      if (!wo || wo === '-') {
+        alert('请先查询有效的工单号');
+        return;
+      }
+
+      const btnTitle = section === 'assembly' ? '组装人员' : (section === 'wiring' ? '接线人员' : '混合人员');
+      document.getElementById('quickEntryTitle').innerText = '⚡ 快捷录入：' + btnTitle;
+      document.getElementById('quickEntryMeta').innerText = '工单：' + wo;
+
+      currentSection = section; // 现在保存的是 assembly/mixed/wiring
+      currentWo = wo;
+
+      try {
+        const res = await fetch(`/api/outsource-record/suggest?workOrder=${encodeURIComponent(wo)}&category=${encodeURIComponent(section)}`);
+        const result = await res.json();
+
+        // 初始化全局日期为当天
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('quickEntryGlobalDate').value = `${yyyy}-${mm}-${dd}`;
+
+        if (result.success && result.data.length > 0) {
+          renderQuickEntryTable(result.data, wo, section);
+        } else {
+          // 如果没有历史记录，初始化为空表格并自动增加一行
+          renderQuickEntryTable([], wo, section);
+          addQuickEntryRow(null, section);
+        }
+
+        document.getElementById('quickEntryPanel').classList.remove('hidden');
+        document.getElementById('quickEntryPanel').scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        alert('获取建议人员失败: ' + err.message);
+      }
+    }
+
+    function renderQuickEntryTable(staff, wo, section) {
+      const tbody = document.getElementById('quickEntryBody');
+      tbody.innerHTML = ''; // 清空
+      staff.forEach((s, index) => {
+        addQuickEntryRow(s, section);
+      });
+    }
+
+    function handleQuickCategoryChange(selectEl, rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      const levelEl = row.querySelector('.qe-level');
+      const supplierEl = row.querySelector('.qe-supplier');
+
+      if (selectEl.value === 'KIMD') {
+        levelEl.value = '';
+        levelEl.disabled = true;
+        levelEl.style.background = '#f1f5f9';
+
+        supplierEl.value = '';
+        supplierEl.disabled = true;
+        supplierEl.style.background = '#f1f5f9';
+      } else {
+        levelEl.disabled = false;
+        levelEl.style.background = 'white';
+
+        supplierEl.disabled = false;
+        supplierEl.style.background = 'white';
+      }
+    }
+
+    function addQuickEntryRow(staffData = null, section = null) {
+      const tbody = document.getElementById('quickEntryBody');
+      const rowId = 'qe-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
+      // Ensure s is properly initialized
+      const s = staffData || {
+        worker_name: '',
+        worker_level: '大工',
+        supplier: '外协', // Changed from '' to '外协' as per user's snippet
+        category: '外协',
+        content: section || currentSection || '',
+        hours: 0 // New field as per user's snippet
+      };
+
+      // 根据板块动态决定工艺选项 (支持多种 Key 匹配，提高容错性)
+      let contentOptions = '<option value="">请选择...</option>';
+      const sec = (section || currentSection || '').toLowerCase();
+
+      const groups = {
+        'assembly': ['组装-返工', '模组组装', '整机接气', '出货'],
+        'wiring': ['接线-返工', '电控配线', '整机接线', '通电通气'],
+        'mixed': ['项目管理', '领料', '上线准备', '总装', '清洁', '打包']
+      };
+
+      const currentGroup = groups[sec] || [];
+
+      // 生成选项
+      currentGroup.forEach(opt => {
+        contentOptions += `<option value="${opt}" ${s.content === opt ? 'selected' : ''}>${opt}</option>`;
+      });
+
+      // 严格检查：如果某条历史记录的工艺完全不属于当前大类，则跳过
+      if (s.content && !currentGroup.includes(s.content) && staffData) {
+        console.warn(`[RefinedFilter] 跳过不属于 ${sec} 的记录: ${s.worker_name} (${s.content})`);
+        return;
+      }
+
+      const row = document.createElement('tr');
+      row.id = rowId;
+      row.innerHTML = `
+                <td><input type="text" class="qe-name" value="${s.worker_name}" style="width:80px; padding:4px; border:1px solid #ddd; border-radius:4px; font-weight:700;"></td>
+                <td>
+                    <select class="qe-level" style="width:70px; padding:4px; border:1px solid #ddd; border-radius:4px;">
+                        <option value="" ${!s.worker_level ? 'selected' : ''}></option>
+                        <option value="大工" ${s.worker_level === '大工' ? 'selected' : ''}>大工</option>
+                        <option value="中工" ${s.worker_level === '中工' ? 'selected' : ''}>中工</option>
+                        <option value="小工" ${s.worker_level === '小工' ? 'selected' : ''}>小工</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="qe-category" style="width:70px; padding:4px; border:1px solid #ddd; border-radius:4px;" 
+                        onchange="handleQuickCategoryChange(this, '${rowId}')">
+                        <option value="外协" ${s.category === '外协' || !s.category ? 'selected' : ''}>外协</option>
+                        <option value="KIMD" ${s.category === 'KIMD' ? 'selected' : ''}>KIMD</option>
+                    </select>
+                </td>
+                <td><input type="text" class="qe-supplier" value="${s.supplier}" style="width:90px; padding:4px; border:1px solid #ddd; border-radius:4px;"></td>
+                <td>
+                    <select class="qe-content" style="width:100px; padding:4px; border:1px solid #ddd; border-radius:4px;">
+                        ${contentOptions}
+                    </select>
+                </td>
+                <td><input type="time" class="qe-st" value="08:30" step="1800" onblur="ensureHalfHour(this)" style="padding:4px; border:1px solid #ddd; border-radius:4px; width:80px;" onchange="calcQuickHours('${rowId}')"></td>
+                <td><input type="time" class="qe-et" step="1800" onblur="ensureHalfHour(this)" style="padding:4px; border:1px solid #ddd; border-radius:4px; width:80px;" onchange="calcQuickHours('${rowId}')"></td>
+                <td><input type="text" class="qe-hours" value="等待计算" readonly style="width:60px; border:none; background:transparent; font-weight:700; color:var(--primary);"></td>
+                <td><input type="text" class="qe-remark" value="" placeholder="备注..." style="width:100%; padding:4px; border:1px solid #ddd; border-radius:4px;"></td>
+                <td style="text-align:center;">
+                    <button class="btn btn-primary qe-save-btn" style="padding:4px 12px; font-size:12px;" 
+                        onclick="saveQuickEntryRecord(this, '${rowId}')">保存</button>
+                    <button class="btn-tool" style="padding:4px 8px; font-size:11px; color:#ef4444; border:none; background:none;" onclick="this.closest('tr').remove()">删除</button>
+                </td>
+      `;
+      tbody.appendChild(row);
+      // 初始化状态
+      handleQuickCategoryChange(row.querySelector('.qe-category'), rowId);
+    }
+
+    function calcQuickHours(rowId) {
+      const row = document.getElementById(rowId);
+      const stValue = row.querySelector('.qe-st').value;
+      const etValue = row.querySelector('.qe-et').value;
+      const hoursEl = row.querySelector('.qe-hours');
+
+      if (!etValue) {
+        hoursEl.value = "等待计算";
+        return;
+      }
+
+      const [h1, m1] = stValue.split(':').map(Number);
+      const [h2, m2] = etValue.split(':').map(Number);
+
+      if (h1 > 11) {
+        hoursEl.value = "特殊";
+        return;
+      }
+
+      let rawHours = (h2 + m2 / 60) - (h1 + m1 / 60);
+      if (rawHours < 0) rawHours += 24;
+
+      const durationHourPart = Math.floor(rawHours + 0.0001);
+      let finalHours = rawHours;
+      if (durationHourPart <= 3) {
+        finalHours = rawHours;
+      } else if (durationHourPart >= 4 && durationHourPart <= 9) {
+        finalHours = rawHours - 1;
+      } else {
+        finalHours = rawHours - 1.5;
+      }
+      hoursEl.value = finalHours.toFixed(1);
+    }
+
+    async function saveQuickEntryRecord(btn, rowId) {
+      const row = document.getElementById(rowId);
+
+      // 从标题栏全局区域采集日期和工单信息
+      const gDate = document.getElementById('quickEntryGlobalDate').value;
+      const wo = document.getElementById('workOrder').value || document.getElementById('heroWorkOrder').textContent;
+      const project = document.getElementById('heroProject').textContent || '-';
+
+      // 格式化日期为 M/D
+      let dateDisplay = '';
+      if (gDate) {
+        const parts = gDate.split('-');
+        dateDisplay = parseInt(parts[1]) + '/' + parseInt(parts[2]);
+      }
+
+      // 从输入列表实时采集数据
+      const name = row.querySelector('.qe-name').value;
+      const level = row.querySelector('.qe-level').value;
+      const category = row.querySelector('.qe-category').value;
+      const supplier = row.querySelector('.qe-supplier').value;
+      const content = row.querySelector('.qe-content').value;
+      const st = row.querySelector('.qe-st').value;
+      const et = row.querySelector('.qe-et').value;
+      const remark = row.querySelector('.qe-remark').value;
+      const hoursText = row.querySelector('.qe-hours').value;
+
+      if (!name.trim()) {
+        alert("请输入人员姓名");
+        return;
+      }
+      if (!content) {
+        alert(`请选择人员 ${name} 的工时挂靠（工艺）`);
+        return;
+      }
+
+      if (category === '外协' && !level) {
+        alert(`外协人员 ${name} 必须选择等级`);
+        return;
+      }
+
+      if (!et) {
+        alert(`请录入 ${name || '新行'} 的下班时间`);
+        return;
+      }
+
+      const hours = isNaN(parseFloat(hoursText)) ? 0 : parseFloat(hoursText);
+
+      const payload = {
+        work_date: dateDisplay,
+        work_order: wo,
+        project_name: project,
+        worker_name: name,
+        worker_level: level,
+        start_time: st,
+        end_time: et,
+        hours: hours,
+        supplier: supplier,
+        content: content,
+        category: category,
+        remark1: remark,
+        shift: '白班'
+      };
+
+      btn.disabled = true;
+      btn.innerText = '保存中...';
+
+      try {
+        const res = await fetch('/api/outsource-record', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+          btn.innerText = '✅ 已保存';
+          btn.style.background = '#e2e8f0';
+          btn.style.color = '#1e293b';
+          btn.onclick = null;
+          // 标记行已完成
+          row.style.opacity = '0.6';
+        } else {
+          alert('保存失败: ' + result.message);
+          btn.disabled = false;
+          btn.innerText = '保存';
+        }
+      } catch (err) {
+        alert('请求异常: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = '保存';
+      }
+    }
+
+    async function saveAllQuickEntries() {
+      const btns = document.querySelectorAll('.qe-save-btn');
+      for (const btn of btns) {
+        if (!btn.disabled && btn.onclick) {
+          await btn.onclick();
+        }
+      }
+    }
+
+    function closeQuickEntry() {
+      document.getElementById('quickEntryPanel').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>

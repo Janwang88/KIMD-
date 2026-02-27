@@ -1,0 +1,361 @@
+[清理垃圾] 服务启动，执行初始文件清理... (保留 30 天)
+
+========================================
+  物料执行情况查询工具
+  服务已启动: http://localhost:3000
+========================================
+
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/26' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/26' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/26' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/26' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/18' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/18' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/25' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/25' ] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '2/22' } page: 1 typeof page: string
+[DEBUG] bind values: [ '2/22' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '55', searchDate: '2/22' } page: 1 typeof page: string
+[DEBUG] bind values: [ '%55%', '%55%', '%55%', '2/22' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '55', searchDate: '2/20' } page: 1 typeof page: string
+[DEBUG] bind values: [ '%55%', '%55%', '%55%', '2/20' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '55', searchDate: '2/19' } page: 1 typeof page: string
+[DEBUG] bind values: [ '%55%', '%55%', '%55%', '2/19' ] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '55', searchDate: '2/10' } page: 1 typeof page: string
+[DEBUG] bind values: [ '%55%', '%55%', '%55%', '2/10' ] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[DEBUG] GET /api/outsource-records { page: '1', pageSize: '20', keyword: '', searchDate: '' } page: 1 typeof page: string
+[DEBUG] bind values: [] 20 0
+[HoursStats] Found header at row 0: {
+  process: 7,
+  group: 8,
+  station: 9,
+  planHours: 11,
+  actualHours: 12,
+  kimdHours: 13,
+  outsourceHours: 14
+}
+[HoursDebug] Row 1 matched '项目管理': Prod=0(undefined) KIMD=170(170) Out=0(0) -> Actual=170
+[HoursDebug] Row 2 skipped '接线--返工' - Not in RULES
+[HoursDebug] Row 3 skipped '组装--返工' - Not in RULES
+[HoursDebug] Row 4 matched '领料': Prod=0(undefined) KIMD=8.5(8.5) Out=7.5(7.5) -> Actual=16
+[HoursDebug] Row 5 matched '上线准备': Prod=0(undefined) KIMD=2(2) Out=0(0) -> Actual=2
+[HoursDebug] Row 6 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 7 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=36(36) -> Actual=36
+[HoursDebug] Row 8 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=140(140) -> Actual=140
+[HoursDebug] Row 9 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=180(180) -> Actual=180
+[HoursDebug] Row 10 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 11 matched '模组组装': Prod=0(undefined) KIMD=0(0) Out=54(54) -> Actual=54
+[HoursDebug] Row 12 matched '电控配线': Prod=0(undefined) KIMD=101(101) Out=196(196) -> Actual=297
+[HoursDebug] Row 13 matched '整机接线': Prod=0(undefined) KIMD=239(239) Out=764.5(764.5) -> Actual=1003.5
+[HoursDebug] Row 14 matched '整机接气': Prod=0(undefined) KIMD=12(12) Out=275(275) -> Actual=287
+[HoursDebug] Row 15 matched '通电通气': Prod=0(undefined) KIMD=0(0) Out=20(20) -> Actual=20
+[HoursDebug] Row 16 skipped 'FQC' - Not in RULES
+[HoursDebug] Row 17 skipped '整机调试' - Not in RULES
+[HoursDebug] Row 18 matched '总装': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 19 skipped '检验' - Not in RULES
+[HoursDebug] Row 20 matched '清洁': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 21 matched '打包': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
+[HoursDebug] Row 22 matched '出货': Prod=0(undefined) KIMD=0(0) Out=0(0) -> Actual=0
